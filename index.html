@@ -122,6 +122,12 @@
       display: block;
     }
     
+    .result.error {
+      background: #ffebee;
+      color: #c62828;
+      display: block;
+    }
+    
     .footer {
       text-align: center;
       margin-top: 25px;
@@ -177,9 +183,9 @@
   </div>
   
   <script>
-    const API_URL = 'https://prime-skud.ru/a/1055042-89ce8100d1c9fce82082a5c481a5f99c';
+    const PROXY_URL = 'https://gate-open.nikisolo946.workers.dev';
     
-    function openGate(btn, deviceId, gateName) {
+    async function openGate(btn, deviceId, gateName) {
       if (btn.disabled) return;
       
       const originalHtml = btn.innerHTML;
@@ -188,18 +194,23 @@
       
       const resultDiv = document.getElementById('result');
       
-      // Используем navigator.sendBeacon — отправляет запрос в фоне
-      const data = new URLSearchParams();
-      data.append('d', deviceId);
-      data.append('r', '1');
-      
-      const success = navigator.sendBeacon(API_URL, data);
-      
-      if (success) {
-        resultDiv.textContent = '✅ ' + gateName + ' открыты!';
-        resultDiv.className = 'result success';
-      } else {
-        resultDiv.textContent = '❌ Ошибка отправки';
+      try {
+        const response = await fetch(PROXY_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: `d=${deviceId}&r=1`
+        });
+        
+        if (response.ok) {
+          resultDiv.textContent = '✅ ' + gateName + ' открыты!';
+          resultDiv.className = 'result success';
+        } else {
+          throw new Error('Ошибка сервера');
+        }
+      } catch (error) {
+        resultDiv.textContent = '❌ Ошибка: ' + error.message;
         resultDiv.className = 'result error';
       }
       
