@@ -122,12 +122,6 @@
       display: block;
     }
     
-    .result.error {
-      background: #ffebee;
-      color: #c62828;
-      display: block;
-    }
-    
     .footer {
       text-align: center;
       margin-top: 25px;
@@ -182,9 +176,6 @@
     </div>
   </div>
   
-  <!-- Скрытый iframe в той же сессии -->
-  <iframe id="gateFrame" name="gateFrame" style="display:none;"></iframe>
-  
   <script>
     const API_URL = 'https://prime-skud.ru/a/1055042-89ce8100d1c9fce82082a5c481a5f99c';
     
@@ -197,46 +188,26 @@
       
       const resultDiv = document.getElementById('result');
       
-      // Создаём форму для отправки через iframe
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = API_URL;
-      form.target = 'gateFrame';
+      // Используем navigator.sendBeacon — отправляет запрос в фоне
+      const data = new URLSearchParams();
+      data.append('d', deviceId);
+      data.append('r', '1');
       
-      const inputD = document.createElement('input');
-      inputD.type = 'hidden';
-      inputD.name = 'd';
-      inputD.value = deviceId;
+      const success = navigator.sendBeacon(API_URL, data);
       
-      const inputR = document.createElement('input');
-      inputR.type = 'hidden';
-      inputR.name = 'r';
-      inputR.value = '1';
-      
-      form.appendChild(inputD);
-      form.appendChild(inputR);
-      document.body.appendChild(form);
-      
-      // Отслеживаем загрузку iframe
-      const iframe = document.getElementById('gateFrame');
-      iframe.onload = function() {
+      if (success) {
         resultDiv.textContent = '✅ ' + gateName + ' открыты!';
         resultDiv.className = 'result success';
-        btn.innerHTML = originalHtml;
-        btn.disabled = false;
-        setTimeout(() => { resultDiv.className = 'result'; }, 3000);
-        document.body.removeChild(form);
-      };
-      
-      iframe.onerror = function() {
-        resultDiv.textContent = '❌ Ошибка открытия';
+      } else {
+        resultDiv.textContent = '❌ Ошибка отправки';
         resultDiv.className = 'result error';
+      }
+      
+      setTimeout(() => {
         btn.innerHTML = originalHtml;
         btn.disabled = false;
-        document.body.removeChild(form);
-      };
-      
-      form.submit();
+        resultDiv.className = 'result';
+      }, 3000);
     }
   </script>
 </body>
