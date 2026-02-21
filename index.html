@@ -87,7 +87,6 @@
       border-radius: 12px;
       cursor: pointer;
       transition: transform 0.2s, box-shadow 0.2s;
-      text-decoration: none;
     }
     
     .gate-btn:hover {
@@ -99,13 +98,33 @@
       transform: translateY(0);
     }
     
+    .gate-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+    
     .gate-btn .icon {
       font-size: 20px;
     }
     
+    .result {
+      text-align: center;
+      padding: 12px;
+      margin-top: 15px;
+      border-radius: 8px;
+      font-size: 14px;
+      display: none;
+    }
+    
+    .result.success {
+      background: #e8f5e9;
+      color: #2e7d32;
+      display: block;
+    }
+    
     .info {
-      background: #fff3cd;
-      color: #856404;
+      background: #e3f2fd;
+      color: #1565c0;
       padding: 15px;
       border-radius: 8px;
       margin-top: 20px;
@@ -144,46 +163,33 @@
       </div>
     </div>
     
-    <!-- Ворота 1 -->
-    <a href="https://prime-skud.ru/a/1055042-89ce8100d1c9fce82082a5c481a5f99c" 
-       class="gate-btn" 
-       target="_blank"
-       onclick="saveState(this, 'Ворота 1')">
+    <button class="gate-btn" onclick="openGate(this, '1225', 'Ворота 1')">
       <span class="icon">🚪</span>
       <span>Ворота 1</span>
-    </a>
+    </button>
     
-    <!-- Ворота 2 -->
-    <a href="https://prime-skud.ru/a/1055042-89ce8100d1c9fce82082a5c481a5f99c" 
-       class="gate-btn" 
-       target="_blank"
-       onclick="saveState(this, 'Ворота 2')">
+    <button class="gate-btn" onclick="openGate(this, '2390', 'Ворота 2')">
       <span class="icon">🚪</span>
       <span>Ворота 2</span>
-    </a>
+    </button>
     
-    <!-- Ворота 3 -->
-    <a href="https://prime-skud.ru/a/1055042-89ce8100d1c9fce82082a5c481a5f99c" 
-       class="gate-btn" 
-       target="_blank"
-       onclick="saveState(this, 'Ворота 3')">
+    <button class="gate-btn" onclick="openGate(this, '2394', 'Ворота 3')">
       <span class="icon">🚪</span>
       <span>Ворота 3</span>
-    </a>
+    </button>
     
-    <!-- Подъезд К37 -->
-    <a href="https://prime-skud.ru/a/1055042-89ce8100d1c9fce82082a5c481a5f99c" 
-       class="gate-btn" 
-       target="_blank"
-       onclick="saveState(this, 'Подъезд К37')">
+    <button class="gate-btn" onclick="openGate(this, '2925', 'Подъезд К37')">
       <span class="icon">🏢</span>
       <span>Подъезд К37</span>
-    </a>
+    </button>
+    
+    <div class="result" id="result"></div>
     
     <div class="info">
-      ⚠️ <strong>Важно!</strong><br>
-      При нажатии откроется страница ПРАЙМ СКУД.<br>
-      Нажмите кнопку на открывшейся странице для открытия ворот.
+      ℹ️ <strong>Первый запуск:</strong><br>
+      Если ворота не открываются, сначала откройте 
+      <a href="https://prime-skud.ru/a/1055042-89ce8100d1c9fce82082a5c481a5f99c" target="_blank">страницу ПРАЙМ СКУД</a> 
+      для авторизации.
     </div>
     
     <div class="footer">
@@ -192,13 +198,110 @@
     </div>
   </div>
   
+  <!-- Скрытый iframe для сохранения сессии -->
+  <iframe id="sessionFrame" name="sessionFrame" style="display:none;" onload="onFrameLoad()"></iframe>
+  <iframe id="gateFrame" name="gateFrame" style="display:none;" onload="onGateLoad()"></iframe>
+  
   <script>
-    function saveState(btn, name) {
-      const originalHtml = btn.innerHTML;
-      btn.innerHTML = '<span class="icon">✅</span><span>Открываем...</span>';
+    const API_URL = 'https://prime-skud.ru/a/1055042-89ce8100d1c9fce82082a5c481a5f99c';
+    let isSessionLoaded = false;
+    let pendingGate = null;
+    
+    // Загружаем сессию при старте
+    window.addEventListener('load', () => {
+      document.getElementById('sessionFrame').src = API_URL;
+    });
+    
+    function onFrameLoad() {
+      isSessionLoaded = true;
+      // Если есть ожидающий запрос, выполняем его
+      if (pendingGate) {
+        sendGateRequest(pendingGate.btn, pendingGate.deviceId, pendingGate.gateName);
+        pendingGate = null;
+      }
+    }
+    
+    function onGateLoad() {
+      const resultDiv = document.getElementById('result');
+      resultDiv.textContent = '✅ Ворота открыты!';
+      resultDiv.className = 'result success';
+      
       setTimeout(() => {
-        btn.innerHTML = originalHtml;
-      }, 2000);
+        resultDiv.className = 'result';
+      }, 3000);
+    }
+    
+    function openGate(btn, deviceId, gateName) {
+      if (btn.disabled) return;
+      
+      const originalHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<span class="icon">⏳</span><span>Открываем...</span>';
+      
+      const resultDiv = document.getElementById('result');
+      resultDiv.className = 'result';
+      
+      // Создаём форму для отправки через iframe
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = API_URL;
+      form.target = 'gateFrame';
+      
+      const inputD = document.createElement('input');
+      inputD.type = 'hidden';
+      inputD.name = 'd';
+      inputD.value = deviceId;
+      
+      const inputR = document.createElement('input');
+      inputR.type = 'hidden';
+      inputR.name = 'r';
+      inputR.value = '1';
+      
+      form.appendChild(inputD);
+      form.appendChild(inputR);
+      document.body.appendChild(form);
+      
+      // Проверяем, загружена ли сессия
+      if (!isSessionLoaded) {
+        pendingGate = { btn, deviceId, gateName, originalHtml };
+        form.submit();
+        return;
+      }
+      
+      sendGateRequest(btn, deviceId, gateName);
+      document.body.removeChild(form);
+    }
+    
+    function sendGateRequest(btn, deviceId, gateName) {
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = API_URL;
+      form.target = 'gateFrame';
+      
+      const inputD = document.createElement('input');
+      inputD.type = 'hidden';
+      inputD.name = 'd';
+      inputD.value = deviceId;
+      
+      const inputR = document.createElement('input');
+      inputR.type = 'hidden';
+      inputR.name = 'r';
+      inputR.value = '1';
+      
+      form.appendChild(inputD);
+      form.appendChild(inputR);
+      document.body.appendChild(form);
+      form.submit();
+      
+      setTimeout(() => {
+        btn.innerHTML = '<span class="icon">✅</span><span>Отправлено!</span>';
+        btn.disabled = false;
+        
+        setTimeout(() => {
+          const icon = deviceId === '2925' ? '🏢' : '🚪';
+          btn.innerHTML = `<span class="icon">${icon}</span><span>${gateName}</span>`;
+        }, 2000);
+      }, 500);
     }
   </script>
 </body>
