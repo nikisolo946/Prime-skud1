@@ -98,6 +98,11 @@
       transform: translateY(0);
     }
     
+    .gate-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+    
     .gate-btn .icon {
       font-size: 20px;
     }
@@ -114,6 +119,12 @@
     .result.success {
       background: #e8f5e9;
       color: #2e7d32;
+      display: block;
+    }
+    
+    .result.error {
+      background: #ffebee;
+      color: #c62828;
       display: block;
     }
     
@@ -158,22 +169,22 @@
       </div>
     </div>
     
-    <button class="gate-btn" onclick="openGate('1225', 'Ворота 1')">
+    <button class="gate-btn" onclick="openGate(this, '1225', 'Ворота 1')">
       <span class="icon">🚪</span>
       <span>Ворота 1</span>
     </button>
     
-    <button class="gate-btn" onclick="openGate('2390', 'Ворота 2')">
+    <button class="gate-btn" onclick="openGate(this, '2390', 'Ворота 2')">
       <span class="icon">🚪</span>
       <span>Ворота 2</span>
     </button>
     
-    <button class="gate-btn" onclick="openGate('2394', 'Ворота 3')">
+    <button class="gate-btn" onclick="openGate(this, '2394', 'Ворота 3')">
       <span class="icon">🚪</span>
       <span>Ворота 3</span>
     </button>
     
-    <button class="gate-btn" onclick="openGate('2925', 'Подъезд К37')">
+    <button class="gate-btn" onclick="openGate(this, '2925', 'Подъезд К37')">
       <span class="icon">🏢</span>
       <span>Подъезд К37</span>
     </button>
@@ -181,9 +192,11 @@
     <div class="result" id="result"></div>
     
     <div class="info">
-      ℹ️ <strong>Важно!</strong><br>
-      Сначала откройте <a href="https://prime-skud.ru/a/1055042-89ce8100d1c9fce82082a5c481a5f99c" target="_blank">страницу ПРАЙМ СКУД</a> 
-      для авторизации в новой вкладке, затем вернитесь и нажмите кнопку ворот.
+      ℹ️ <strong>Первый запуск:</strong><br>
+      1. Откройте <a href="https://prime-skud.ru/a/1055042-89ce8100d1c9fce82082a5c481a5f99c" target="_blank">страницу ПРАЙМ СКУД</a> в этой вкладке<br>
+      2. Нажмите любую кнопку для открытия ворот<br>
+      3. Вернитесь на эту страницу (кнопка "Назад" в браузере)<br>
+      4. Теперь ворота будут открываться напрямую
     </div>
     
     <div class="footer">
@@ -195,26 +208,49 @@
   <script>
     const API_URL = 'https://prime-skud.ru/a/1055042-89ce8100d1c9fce82082a5c481a5f99c';
     
-    function openGate(deviceId, gateName) {
-      // Открываем в том же окне для сохранения куки
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = API_URL;
+    async function openGate(btn, deviceId, gateName) {
+      if (btn.disabled) return;
       
-      const inputD = document.createElement('input');
-      inputD.type = 'hidden';
-      inputD.name = 'd';
-      inputD.value = deviceId;
+      const originalHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<span class="icon">⏳</span><span>Открываем...</span>';
       
-      const inputR = document.createElement('input');
-      inputR.type = 'hidden';
-      inputR.name = 'r';
-      inputR.value = '1';
+      const resultDiv = document.getElementById('result');
+      resultDiv.className = 'result';
       
-      form.appendChild(inputD);
-      form.appendChild(inputR);
-      document.body.appendChild(form);
-      form.submit();
+      try {
+        // Отправляем запрос с куки (credentials: 'include')
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          credentials: 'include', // Важно: отправляем куки
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: `d=${deviceId}&r=1`
+        });
+        
+        if (response.ok) {
+          resultDiv.textContent = '✅ ' + gateName + ' открыты!';
+          resultDiv.className = 'result success';
+        } else {
+          // Если ошибка 403/401 — нужно авторизоваться
+          if (response.status === 403 || response.status === 401) {
+            resultDiv.textContent = '❌ Нужно авторизоваться! Откройте ссылку выше.';
+            resultDiv.className = 'result error';
+          } else {
+            throw new Error('Ошибка сервера: ' + response.status);
+          }
+        }
+      } catch (error) {
+        resultDiv.textContent = '❌ Ошибка: ' + error.message;
+        resultDiv.className = 'result error';
+      }
+      
+      setTimeout(() => {
+        btn.innerHTML = originalHtml;
+        btn.disabled = false;
+        resultDiv.className = 'result';
+      }, 3000);
     }
   </script>
 </body>
