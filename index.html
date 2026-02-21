@@ -87,7 +87,6 @@
       border-radius: 12px;
       cursor: pointer;
       transition: transform 0.2s, box-shadow 0.2s;
-      text-decoration: none;
     }
     
     .gate-btn:hover {
@@ -101,16 +100,6 @@
     
     .gate-btn .icon {
       font-size: 20px;
-    }
-    
-    .result {
-      text-align: center;
-      padding: 10px;
-      margin-top: 15px;
-      border-radius: 8px;
-      font-size: 14px;
-      background: #fff3cd;
-      color: #856404;
     }
     
     .footer {
@@ -139,49 +128,25 @@
       </div>
     </div>
     
-    <!-- Ворота 1 -->
-    <form action="https://prime-skud.ru/a/1055042-89ce8100d1c9fce82082a5c481a5f99c" method="POST" target="gateFrame">
-      <input type="hidden" name="d" value="1225">
-      <input type="hidden" name="r" value="1">
-      <button type="submit" class="gate-btn" data-icon="🚪" data-text="Ворота 1">
-        <span class="icon">🚪</span>
-        <span>Ворота 1</span>
-      </button>
-    </form>
+    <button class="gate-btn" onclick="openGate('1225', '🚪', 'Ворота 1')">
+      <span class="icon">🚪</span>
+      <span>Ворота 1</span>
+    </button>
     
-    <!-- Ворота 2 -->
-    <form action="https://prime-skud.ru/a/1055042-89ce8100d1c9fce82082a5c481a5f99c" method="POST" target="gateFrame">
-      <input type="hidden" name="d" value="2390">
-      <input type="hidden" name="r" value="1">
-      <button type="submit" class="gate-btn" data-icon="🚪" data-text="Ворота 2">
-        <span class="icon">🚪</span>
-        <span>Ворота 2</span>
-      </button>
-    </form>
+    <button class="gate-btn" onclick="openGate('2390', '🚪', 'Ворота 2')">
+      <span class="icon">🚪</span>
+      <span>Ворота 2</span>
+    </button>
     
-    <!-- Ворота 3 -->
-    <form action="https://prime-skud.ru/a/1055042-89ce8100d1c9fce82082a5c481a5f99c" method="POST" target="gateFrame">
-      <input type="hidden" name="d" value="2394">
-      <input type="hidden" name="r" value="1">
-      <button type="submit" class="gate-btn" data-icon="🚪" data-text="Ворота 3">
-        <span class="icon">🚪</span>
-        <span>Ворота 3</span>
-      </button>
-    </form>
+    <button class="gate-btn" onclick="openGate('2394', '🚪', 'Ворота 3')">
+      <span class="icon">🚪</span>
+      <span>Ворота 3</span>
+    </button>
     
-    <!-- Подъезд К37 -->
-    <form action="https://prime-skud.ru/a/1055042-89ce8100d1c9fce82082a5c481a5f99c" method="POST" target="gateFrame">
-      <input type="hidden" name="d" value="2925">
-      <input type="hidden" name="r" value="1">
-      <button type="submit" class="gate-btn" data-icon="🏢" data-text="Подъезд К37">
-        <span class="icon">🏢</span>
-        <span>Подъезд К37</span>
-      </button>
-    </form>
-    
-    <div class="result" id="resultMsg">
-      ⚠️ При нажатии откроется новая вкладка с подтверждением
-    </div>
+    <button class="gate-btn" onclick="openGate('2925', '🏢', 'Подъезд К37')">
+      <span class="icon">🏢</span>
+      <span>Подъезд К37</span>
+    </button>
     
     <div class="footer">
       <p>Сервис предоставлен <a href="https://prime-pult.ru/" target="_blank">ПРАЙМ ПУЛЬТ</a></p>
@@ -189,22 +154,32 @@
     </div>
   </div>
   
-  <!-- Скрытый iframe для отправки форм -->
-  <iframe name="gateFrame" style="display:none;"></iframe>
-  
   <script>
-    document.querySelectorAll('form').forEach(form => {
-      const btn = form.querySelector('.gate-btn');
-      const icon = btn.dataset.icon;
-      const text = btn.dataset.text;
+    const API_URL = 'https://prime-skud.ru/a/1055042-89ce8100d1c9fce82082a5c481a5f99c';
+    
+    function openGate(deviceId, icon, name) {
+      // Создаём форму и отправляем в новой вкладке
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = API_URL;
+      form.target = '_blank';
       
-      form.addEventListener('submit', () => {
-        btn.innerHTML = `<span class="icon">✅</span><span>Отправлено!</span>`;
-        setTimeout(() => {
-          btn.innerHTML = `<span class="icon">${icon}</span><span>${text}</span>`;
-        }, 2000);
-      });
-    });
+      const inputD = document.createElement('input');
+      inputD.type = 'hidden';
+      inputD.name = 'd';
+      inputD.value = deviceId;
+      
+      const inputR = document.createElement('input');
+      inputR.type = 'hidden';
+      inputR.name = 'r';
+      inputR.value = '1';
+      
+      form.appendChild(inputD);
+      form.appendChild(inputR);
+      document.body.appendChild(form);
+      form.submit();
+      document.body.removeChild(form);
+    }
   </script>
 </body>
 </html>
