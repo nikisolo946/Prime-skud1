@@ -98,8 +98,34 @@
       transform: translateY(0);
     }
     
+    .gate-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+    
     .gate-btn .icon {
       font-size: 20px;
+    }
+    
+    .result {
+      text-align: center;
+      padding: 12px;
+      margin-top: 15px;
+      border-radius: 8px;
+      font-size: 14px;
+      display: none;
+    }
+    
+    .result.success {
+      background: #e8f5e9;
+      color: #2e7d32;
+      display: block;
+    }
+    
+    .result.error {
+      background: #ffebee;
+      color: #c62828;
+      display: block;
     }
     
     .footer {
@@ -128,25 +154,27 @@
       </div>
     </div>
     
-    <button class="gate-btn" onclick="openGate('1225', '🚪', 'Ворота 1')">
+    <button class="gate-btn" onclick="openGate(this, '1225', 'Ворота 1')">
       <span class="icon">🚪</span>
       <span>Ворота 1</span>
     </button>
     
-    <button class="gate-btn" onclick="openGate('2390', '🚪', 'Ворота 2')">
+    <button class="gate-btn" onclick="openGate(this, '2390', 'Ворота 2')">
       <span class="icon">🚪</span>
       <span>Ворота 2</span>
     </button>
     
-    <button class="gate-btn" onclick="openGate('2394', '🚪', 'Ворота 3')">
+    <button class="gate-btn" onclick="openGate(this, '2394', 'Ворота 3')">
       <span class="icon">🚪</span>
       <span>Ворота 3</span>
     </button>
     
-    <button class="gate-btn" onclick="openGate('2925', '🏢', 'Подъезд К37')">
+    <button class="gate-btn" onclick="openGate(this, '2925', 'Подъезд К37')">
       <span class="icon">🏢</span>
       <span>Подъезд К37</span>
     </button>
+    
+    <div class="result" id="result"></div>
     
     <div class="footer">
       <p>Сервис предоставлен <a href="https://prime-pult.ru/" target="_blank">ПРАЙМ ПУЛЬТ</a></p>
@@ -154,15 +182,26 @@
     </div>
   </div>
   
+  <!-- Скрытый iframe в той же сессии -->
+  <iframe id="gateFrame" name="gateFrame" style="display:none;"></iframe>
+  
   <script>
     const API_URL = 'https://prime-skud.ru/a/1055042-89ce8100d1c9fce82082a5c481a5f99c';
     
-    function openGate(deviceId, icon, name) {
-      // Создаём форму и отправляем в новой вкладке
+    function openGate(btn, deviceId, gateName) {
+      if (btn.disabled) return;
+      
+      const originalHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<span class="icon">⏳</span><span>Открываем...</span>';
+      
+      const resultDiv = document.getElementById('result');
+      
+      // Создаём форму для отправки через iframe
       const form = document.createElement('form');
       form.method = 'POST';
       form.action = API_URL;
-      form.target = '_blank';
+      form.target = 'gateFrame';
       
       const inputD = document.createElement('input');
       inputD.type = 'hidden';
@@ -177,8 +216,27 @@
       form.appendChild(inputD);
       form.appendChild(inputR);
       document.body.appendChild(form);
+      
+      // Отслеживаем загрузку iframe
+      const iframe = document.getElementById('gateFrame');
+      iframe.onload = function() {
+        resultDiv.textContent = '✅ ' + gateName + ' открыты!';
+        resultDiv.className = 'result success';
+        btn.innerHTML = originalHtml;
+        btn.disabled = false;
+        setTimeout(() => { resultDiv.className = 'result'; }, 3000);
+        document.body.removeChild(form);
+      };
+      
+      iframe.onerror = function() {
+        resultDiv.textContent = '❌ Ошибка открытия';
+        resultDiv.className = 'result error';
+        btn.innerHTML = originalHtml;
+        btn.disabled = false;
+        document.body.removeChild(form);
+      };
+      
       form.submit();
-      document.body.removeChild(form);
     }
   </script>
 </body>
