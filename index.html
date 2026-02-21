@@ -2,19 +2,29 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Открытие ворот — ТСЖ Паруса над Камой</title>
+  
+  <!-- PWA / Mobile -->
+  <meta name="theme-color" content="#667eea">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Ворота">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚪</text></svg>">
+  
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      -webkit-tap-highlight-color: transparent;
     }
     
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 100vh;
+      min-height: 100dvh;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -23,7 +33,7 @@
     
     .container {
       background: white;
-      border-radius: 20px;
+      border-radius: 24px;
       padding: 30px;
       max-width: 400px;
       width: 100%;
@@ -37,13 +47,13 @@
     
     .header h1 {
       color: #333;
-      font-size: 22px;
+      font-size: 20px;
       margin-bottom: 5px;
     }
     
     .header .subtitle {
-      color: #666;
-      font-size: 14px;
+      color: #888;
+      font-size: 13px;
     }
     
     .status {
@@ -52,10 +62,10 @@
       gap: 6px;
       background: #e8f5e9;
       color: #2e7d32;
-      padding: 6px 12px;
+      padding: 6px 14px;
       border-radius: 20px;
       font-size: 12px;
-      margin-top: 10px;
+      margin-top: 12px;
     }
     
     .status-dot {
@@ -67,80 +77,70 @@
     }
     
     @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(0.9); }
     }
     
-    .gate-btn {
+    .gates {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .gate-link {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
+      gap: 12px;
       width: 100%;
-      padding: 18px;
-      margin: 10px 0;
+      padding: 20px;
       font-size: 16px;
       font-weight: 600;
       color: white;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
+      border-radius: 14px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
     }
     
-    .gate-btn:hover {
+    .gate-link:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
     }
     
-    .gate-btn:active {
-      transform: translateY(0);
+    .gate-link:active {
+      transform: translateY(0) scale(0.98);
     }
     
-    .gate-btn:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
-    }
-    
-    .gate-btn .icon {
-      font-size: 20px;
-    }
-    
-    .result {
-      text-align: center;
-      padding: 12px;
-      margin-top: 15px;
-      border-radius: 8px;
-      font-size: 14px;
-      display: none;
-    }
-    
-    .result.success {
-      background: #e8f5e9;
-      color: #2e7d32;
-      display: block;
-    }
-    
-    .result.error {
-      background: #ffebee;
-      color: #c62828;
-      display: block;
+    .gate-link .icon {
+      font-size: 22px;
     }
     
     .info {
-      background: #e3f2fd;
-      color: #1565c0;
-      padding: 15px;
-      border-radius: 8px;
+      background: linear-gradient(135deg, #fff3cd 0%, #ffe8a1 100%);
+      color: #856404;
+      padding: 16px;
+      border-radius: 12px;
       margin-top: 20px;
       font-size: 13px;
-      line-height: 1.5;
+      line-height: 1.6;
+      border: 1px solid #ffc107;
     }
     
-    .info a {
-      color: #667eea;
-      font-weight: 600;
+    .info strong {
+      display: block;
+      margin-bottom: 8px;
+      color: #664d03;
+    }
+    
+    .info ol {
+      margin: 0;
+      padding-left: 20px;
+    }
+    
+    .info li {
+      margin: 4px 0;
     }
     
     .footer {
@@ -148,13 +148,39 @@
       margin-top: 25px;
       padding-top: 15px;
       border-top: 1px solid #eee;
-      font-size: 12px;
-      color: #999;
+      font-size: 11px;
+      color: #aaa;
     }
     
     .footer a {
       color: #667eea;
       text-decoration: none;
+      font-weight: 500;
+    }
+    
+    .footer a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Mobile optimizations */
+    @media (max-width: 480px) {
+      body {
+        padding: 15px;
+      }
+      
+      .container {
+        padding: 20px;
+        border-radius: 20px;
+      }
+      
+      .header h1 {
+        font-size: 18px;
+      }
+      
+      .gate-link {
+        padding: 18px;
+        font-size: 15px;
+      }
     }
   </style>
 </head>
@@ -169,89 +195,63 @@
       </div>
     </div>
     
-    <button class="gate-btn" onclick="openGate(this, '1225', 'Ворота 1')">
-      <span class="icon">🚪</span>
-      <span>Ворота 1</span>
-    </button>
-    
-    <button class="gate-btn" onclick="openGate(this, '2390', 'Ворота 2')">
-      <span class="icon">🚪</span>
-      <span>Ворота 2</span>
-    </button>
-    
-    <button class="gate-btn" onclick="openGate(this, '2394', 'Ворота 3')">
-      <span class="icon">🚪</span>
-      <span>Ворота 3</span>
-    </button>
-    
-    <button class="gate-btn" onclick="openGate(this, '2925', 'Подъезд К37')">
-      <span class="icon">🏢</span>
-      <span>Подъезд К37</span>
-    </button>
-    
-    <div class="result" id="result"></div>
+    <div class="gates">
+      <a href="https://prime-skud.ru/a/1055042-89ce8100d1c9fce82082a5c481a5f99c" class="gate-link">
+        <span class="icon">🚪</span>
+        <span>Ворота 1</span>
+      </a>
+      
+      <a href="https://prime-skud.ru/a/1055042-89ce8100d1c9fce82082a5c481a5f99c" class="gate-link">
+        <span class="icon">🚪</span>
+        <span>Ворота 2</span>
+      </a>
+      
+      <a href="https://prime-skud.ru/a/1055042-89ce8100d1c9fce82082a5c481a5f99c" class="gate-link">
+        <span class="icon">🚪</span>
+        <span>Ворота 3</span>
+      </a>
+      
+      <a href="https://prime-skud.ru/a/1055042-89ce8100d1c9fce82082a5c481a5f99c" class="gate-link">
+        <span class="icon">🏢</span>
+        <span>Подъезд К37</span>
+      </a>
+    </div>
     
     <div class="info">
-      ℹ️ <strong>Первый запуск:</strong><br>
-      1. Откройте <a href="https://prime-skud.ru/a/1055042-89ce8100d1c9fce82082a5c481a5f99c" target="_blank">страницу ПРАЙМ СКУД</a> в этой вкладке<br>
-      2. Нажмите любую кнопку для открытия ворот<br>
-      3. Вернитесь на эту страницу (кнопка "Назад" в браузере)<br>
-      4. Теперь ворота будут открываться напрямую
+      <strong>📱 Как открыть ворота:</strong>
+      <ol>
+        <li>Нажмите на кнопку нужных ворот</li>
+        <li>На открывшейся странице нажмите кнопку ещё раз</li>
+        <li>Ворота откроются!</li>
+      </ol>
     </div>
     
     <div class="footer">
       <p>Сервис предоставлен <a href="https://prime-pult.ru/" target="_blank">ПРАЙМ ПУЛЬТ</a></p>
-      <p style="margin-top: 5px;">Сделано в России 🇷🇺</p>
+      <p style="margin-top: 6px;">🇷🇺 Сделано в России</p>
     </div>
   </div>
   
   <script>
-    const API_URL = 'https://prime-skud.ru/a/1055042-89ce8100d1c9fce82082a5c481a5f99c';
+    // Добавляем визуальный эффект при нажатии
+    document.querySelectorAll('.gate-link').forEach(link => {
+      link.addEventListener('click', function() {
+        this.style.opacity = '0.7';
+        setTimeout(() => {
+          this.style.opacity = '1';
+        }, 300);
+      });
+    });
     
-    async function openGate(btn, deviceId, gateName) {
-      if (btn.disabled) return;
+    // PWA: предложение добавить на главный экран
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
       
-      const originalHtml = btn.innerHTML;
-      btn.disabled = true;
-      btn.innerHTML = '<span class="icon">⏳</span><span>Открываем...</span>';
-      
-      const resultDiv = document.getElementById('result');
-      resultDiv.className = 'result';
-      
-      try {
-        // Отправляем запрос с куки (credentials: 'include')
-        const response = await fetch(API_URL, {
-          method: 'POST',
-          credentials: 'include', // Важно: отправляем куки
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: `d=${deviceId}&r=1`
-        });
-        
-        if (response.ok) {
-          resultDiv.textContent = '✅ ' + gateName + ' открыты!';
-          resultDiv.className = 'result success';
-        } else {
-          // Если ошибка 403/401 — нужно авторизоваться
-          if (response.status === 403 || response.status === 401) {
-            resultDiv.textContent = '❌ Нужно авторизоваться! Откройте ссылку выше.';
-            resultDiv.className = 'result error';
-          } else {
-            throw new Error('Ошибка сервера: ' + response.status);
-          }
-        }
-      } catch (error) {
-        resultDiv.textContent = '❌ Ошибка: ' + error.message;
-        resultDiv.className = 'result error';
-      }
-      
-      setTimeout(() => {
-        btn.innerHTML = originalHtml;
-        btn.disabled = false;
-        resultDiv.className = 'result';
-      }, 3000);
-    }
+      // Показываем кнопку установки (опционально)
+      console.log('PWA доступно для установки');
+    });
   </script>
 </body>
 </html>
