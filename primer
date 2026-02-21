@@ -1,0 +1,53 @@
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+		<meta http-equiv="Content-language" content="RU">
+		<title>ПРАЙМ СКУД: ТСЖ Паруса над Камой</title>
+		<script type="text/javascript" src="/source/jquery-1.5.1.min.js"></script>
+		<script type="text/javascript" src="/source/js_collection.js?last_edit=1675452863"></script>
+	</head>
+	<body>
+		<style type="text/css">
+			body { 
+				zoom: 2.5; 
+				/*-moz-transform: scale(2.5);*/ 
+				/*-moz-transform-origin: 0 0;*/
+				font-family: tahoma, verdana, arial, sans-serif;
+			} 
+			input[type=button] {
+				margin: 5px;
+				padding: 5px;
+			}
+			h1 {
+				text-align: center;
+			}
+		</style>
+		<h1><img src="/source/skud_logo.png" style="vertical-align: middle; margin-right: 5px;" /> <span style="white-space: nowrap;">ПРАЙМ СКУД</span></h1>Объект: ТСЖ Паруса над Камой<br>Ссылка доступа: #1055042<br><br><b>Ворота 1:</b> (Online: <span title="21.02.2026 10:24 (МСК)" style="color: green">сейчас</span>)<br><input type="button" value="Ворота 1" name="btn_1225_1" onclick="$(this).attr('disabled', 1);
+							$('#wait_d1225r1').show();
+							ajax_send_data('/a/1055042-89ce8100d1c9fce82082a5c481a5f99c', 'd=1225&r=1'); " style="font-size: 20px;"  />
+						<img src="/source/wait.gif" class="wait_gif" style="display: none" id="wait_d1225r1" />
+						<span id="res_d1225r1" onclick="$(this).html('');"></span>
+						<br><br><b>Ворота 2:</b> (Online: <span title="21.02.2026 10:24 (МСК)" style="color: green">сейчас</span>)<br><input type="button" value="Ворота 2" name="btn_2390_1" onclick="$(this).attr('disabled', 1);
+							$('#wait_d2390r1').show();
+							ajax_send_data('/a/1055042-89ce8100d1c9fce82082a5c481a5f99c', 'd=2390&r=1'); " style="font-size: 20px;"  />
+						<img src="/source/wait.gif" class="wait_gif" style="display: none" id="wait_d2390r1" />
+						<span id="res_d2390r1" onclick="$(this).html('');"></span>
+						<br><br><b>Ворота 3:</b> (Online: <span title="21.02.2026 10:24 (МСК)" style="color: green">сейчас</span>)<br><input type="button" value="Ворота 3" name="btn_2394_1" onclick="$(this).attr('disabled', 1);
+							$('#wait_d2394r1').show();
+							ajax_send_data('/a/1055042-89ce8100d1c9fce82082a5c481a5f99c', 'd=2394&r=1'); " style="font-size: 20px;"  />
+						<img src="/source/wait.gif" class="wait_gif" style="display: none" id="wait_d2394r1" />
+						<span id="res_d2394r1" onclick="$(this).html('');"></span>
+						<br><br><b>Подъезд К37:</b> (Online: <span title="21.02.2026 10:24 (МСК)" style="color: green">сейчас</span>)<br><input type="button" value="Подъезд К37" name="btn_2925_1" onclick="$(this).attr('disabled', 1);
+							$('#wait_d2925r1').show();
+							ajax_send_data('/a/1055042-89ce8100d1c9fce82082a5c481a5f99c', 'd=2925&r=1'); " style="font-size: 20px;"  />
+						<img src="/source/wait.gif" class="wait_gif" style="display: none" id="wait_d2925r1" />
+						<span id="res_d2925r1" onclick="$(this).html('');"></span>
+						<br><br><hr><b>Создание гостевых ссылок:</b><br><div id="gl_div"><input type="button" value="Создать новую" onclick="if (window.confirm('Вы действительно хотите создать новую гостевую ссылку?')){ $(this).attr('disabled', 1); $('#wait_cgl').show(); ajax_send_data('/a/1055042-89ce8100d1c9fce82082a5c481a5f99c', 'cgl=1'); } " style="font-size: 20px;" />
+	<img src="/source/wait.gif" class="wait_gif" style="display: none" id="wait_cgl" />
+		<br></div><hr>
+		<div style="text-align: center">
+			Сервис предоставлен <a href="https://prime-pult.ru/" target="_blank"><b>ПРАЙМ ПУЛЬТ</b></a><br>Cделано в России
+		</div>
+	</body>
+</html>

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Открытие ворот — ТСЖ Паруса над Камой</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+    
+    .header h1 {
+      color: #333;
+      font-size: 22px;
+      margin-bottom: 5px;
+    }
+    
+    .header .subtitle {
+      color: #666;
+      font-size: 14px;
+    }
+    
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #e8f5e9;
+      color: #2e7d32;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      margin-top: 10px;
+    }
+    
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: #4caf50;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .gate-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 18px;
+      margin: 10px 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: white;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+    }
+    
+    .gate-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .gate-btn:active {
+      transform: translateY(0);
+    }
+    
+    .gate-btn .icon {
+      font-size: 20px;
+    }
+    
+    .result {
+      text-align: center;
+      padding: 10px;
+      margin-top: 15px;
+      border-radius: 8px;
+      font-size: 14px;
+      background: #fff3cd;
+      color: #856404;
+    }
+    
+    .footer {
+      text-align: center;
+      margin-top: 25px;
+      padding-top: 15px;
+      border-top: 1px solid #eee;
+      font-size: 12px;
+      color: #999;
+    }
+    
+    .footer a {
+      color: #667eea;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🏠 ТСЖ Паруса над Камой</h1>
+      <p class="subtitle">Система доступа ПРАЙМ СКУД</p>
+      <div class="status">
+        <span class="status-dot"></span>
+        <span>Система онлайн</span>
+      </div>
+    </div>
+    
+    <!-- Ворота 1 -->
+    <form action="https://prime-skud.ru/a/1055042-89ce8100d1c9fce82082a5c481a5f99c" method="POST" target="gateFrame">
+      <input type="hidden" name="d" value="1225">
+      <input type="hidden" name="r" value="1">
+      <button type="submit" class="gate-btn" onclick="setTimeout(() => { this.form.querySelector('.gate-btn').innerHTML = '<span class=\"icon\">✅</span><span>Отправлено!</span>'; }, 500)">
+        <span class="icon">🚪</span>
+        <span>Ворота 1</span>
+      </button>
+    </form>
+    
+    <!-- Ворота 2 -->
+    <form action="https://prime-skud.ru/a/1055042-89ce8100d1c9fce82082a5c481a5f99c" method="POST" target="gateFrame">
+      <input type="hidden" name="d" value="2390">
+      <input type="hidden" name="r" value="1">
+      <button type="submit" class="gate-btn" onclick="setTimeout(() => { this.form.querySelector('.gate-btn').innerHTML = '<span class=\"icon\">✅</span><span>Отправлено!</span>'; }, 500)">
+        <span class="icon">🚪</span>
+        <span>Ворота 2</span>
+      </button>
+    </form>
+    
+    <!-- Ворота 3 -->
+    <form action="https://prime-skud.ru/a/1055042-89ce8100d1c9fce82082a5c481a5f99c" method="POST" target="gateFrame">
+      <input type="hidden" name="d" value="2394">
+      <input type="hidden" name="r" value="1">
+      <button type="submit" class="gate-btn" onclick="setTimeout(() => { this.form.querySelector('.gate-btn').innerHTML = '<span class=\"icon\">✅</span><span>Отправлено!</span>'; }, 500)">
+        <span class="icon">🚪</span>
+        <span>Ворота 3</span>
+      </button>
+    </form>
+    
+    <!-- Подъезд К37 -->
+    <form action="https://prime-skud.ru/a/1055042-89ce8100d1c9fce82082a5c481a5f99c" method="POST" target="gateFrame">
+      <input type="hidden" name="d" value="2925">
+      <input type="hidden" name="r" value="1">
+      <button type="submit" class="gate-btn" onclick="setTimeout(() => { this.form.querySelector('.gate-btn').innerHTML = '<span class=\"icon\">✅</span><span>Отправлено!</span>'; }, 500)">
+        <span class="icon">🏢</span>
+        <span>Подъезд К37</span>
+      </button>
+    </form>
+    
+    <div class="result">
+      ⚠️ При нажатии откроется новая вкладка с подтверждением
+    </div>
+    
+    <div class="footer">
+      <p>Сервис предоставлен <a href="https://prime-pult.ru/" target="_blank">ПРАЙМ ПУЛЬТ</a></p>
+      <p style="margin-top: 5px;">Сделано в России 🇷🇺</p>
+    </div>
+  </div>
+  
+  <!-- Скрытый iframe для отправки форм -->
+  <iframe name="gateFrame" style="display:none;"></iframe>
+  
+  <script>
+    // Восстанавливаем текст кнопок через 2 секунды
+    document.querySelectorAll('form').forEach(form => {
+      form.addEventListener('submit', () => {
+        const btn = form.querySelector('.gate-btn');
+        const originalIcon = btn.querySelector('.icon').textContent === '🚪' ? '🚪' : '🏢';
+        const originalText = btn.childNodes[btn.childNodes.length - 1].textContent.trim();
+        setTimeout(() => {
+          btn.innerHTML = `<span class="icon">${originalIcon}</span><span>${originalText}</span>`;
+        }, 2000);
+      });
+    });
+  </script>
+</body>
+</html>
