@@ -143,7 +143,7 @@
     <form action="https://prime-skud.ru/a/1055042-89ce8100d1c9fce82082a5c481a5f99c" method="POST" target="gateFrame">
       <input type="hidden" name="d" value="1225">
       <input type="hidden" name="r" value="1">
-      <button type="submit" class="gate-btn" onclick="setTimeout(() => { this.form.querySelector('.gate-btn').innerHTML = '<span class=\"icon\">✅</span><span>Отправлено!</span>'; }, 500)">
+      <button type="submit" class="gate-btn" data-icon="🚪" data-text="Ворота 1">
         <span class="icon">🚪</span>
         <span>Ворота 1</span>
       </button>
@@ -153,7 +153,7 @@
     <form action="https://prime-skud.ru/a/1055042-89ce8100d1c9fce82082a5c481a5f99c" method="POST" target="gateFrame">
       <input type="hidden" name="d" value="2390">
       <input type="hidden" name="r" value="1">
-      <button type="submit" class="gate-btn" onclick="setTimeout(() => { this.form.querySelector('.gate-btn').innerHTML = '<span class=\"icon\">✅</span><span>Отправлено!</span>'; }, 500)">
+      <button type="submit" class="gate-btn" data-icon="🚪" data-text="Ворота 2">
         <span class="icon">🚪</span>
         <span>Ворота 2</span>
       </button>
@@ -163,7 +163,7 @@
     <form action="https://prime-skud.ru/a/1055042-89ce8100d1c9fce82082a5c481a5f99c" method="POST" target="gateFrame">
       <input type="hidden" name="d" value="2394">
       <input type="hidden" name="r" value="1">
-      <button type="submit" class="gate-btn" onclick="setTimeout(() => { this.form.querySelector('.gate-btn').innerHTML = '<span class=\"icon\">✅</span><span>Отправлено!</span>'; }, 500)">
+      <button type="submit" class="gate-btn" data-icon="🚪" data-text="Ворота 3">
         <span class="icon">🚪</span>
         <span>Ворота 3</span>
       </button>
@@ -173,13 +173,13 @@
     <form action="https://prime-skud.ru/a/1055042-89ce8100d1c9fce82082a5c481a5f99c" method="POST" target="gateFrame">
       <input type="hidden" name="d" value="2925">
       <input type="hidden" name="r" value="1">
-      <button type="submit" class="gate-btn" onclick="setTimeout(() => { this.form.querySelector('.gate-btn').innerHTML = '<span class=\"icon\">✅</span><span>Отправлено!</span>'; }, 500)">
+      <button type="submit" class="gate-btn" data-icon="🏢" data-text="Подъезд К37">
         <span class="icon">🏢</span>
         <span>Подъезд К37</span>
       </button>
     </form>
     
-    <div class="result">
+    <div class="result" id="resultMsg">
       ⚠️ При нажатии откроется новая вкладка с подтверждением
     </div>
     
@@ -193,14 +193,15 @@
   <iframe name="gateFrame" style="display:none;"></iframe>
   
   <script>
-    // Восстанавливаем текст кнопок через 2 секунды
     document.querySelectorAll('form').forEach(form => {
+      const btn = form.querySelector('.gate-btn');
+      const icon = btn.dataset.icon;
+      const text = btn.dataset.text;
+      
       form.addEventListener('submit', () => {
-        const btn = form.querySelector('.gate-btn');
-        const originalIcon = btn.querySelector('.icon').textContent === '🚪' ? '🚪' : '🏢';
-        const originalText = btn.childNodes[btn.childNodes.length - 1].textContent.trim();
+        btn.innerHTML = `<span class="icon">✅</span><span>Отправлено!</span>`;
         setTimeout(() => {
-          btn.innerHTML = `<span class="icon">${originalIcon}</span><span>${originalText}</span>`;
+          btn.innerHTML = `<span class="icon">${icon}</span><span>${text}</span>`;
         }, 2000);
       });
     });
