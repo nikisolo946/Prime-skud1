@@ -463,6 +463,10 @@
         localStorage.setItem('primeSkudUrl', url);
         currentUrl = url;
 
+        // Очищаем куку при попытке новой активации
+        primeCookie = '';
+        localStorage.removeItem('primeCookie');
+
         // Шаг 1: Загружаем стартовую страницу
         let responseHtml = await fetchProxy(url);
 
@@ -474,19 +478,19 @@
           await fetchProxy(url, params); // вызовет POST запрос активации
         }
 
-        if (primeCookie) {
-          showGatesScreen();
-        } else {
-          alert('Не удалось получить ключ сессии (куки) от сервера.');
-        }
+        // Если дошли сюда и нет исключений - показываем экран успехом
+        showGatesScreen('ACTIVATED');
 
       } catch (e) {
+        // Мы намеренно идем на второй экран, чтобы показать там красную ошибку пользователю
+        console.error("Поймана ошибка валидации сервера:", e.message);
+
         if (e.message === 'LINK_DELETED') {
-          alert('Ошибка: Эта ссылка была удалена администратором.');
+          showGatesScreen('ERROR_DELETED');
         } else if (e.message === 'LINK_STOLEN') {
-          alert('Ошибка: Ссылка уже была активирована на другом устройстве.');
+          showGatesScreen('ERROR_STOLEN');
         } else {
-          alert('Ошибка связи: ' + e.message);
+          alert('Сетевая ошибка: ' + e.message);
         }
       } finally {
         btn.innerHTML = originHtml;
@@ -546,7 +550,7 @@
       }
     }
 
-    function showGatesScreen() {
+    function showGatesScreen(overrideStatus = null) {
       if (!currentUrl) {
         alert('Сначала введите ссылку!');
         return;
@@ -559,7 +563,9 @@
       document.getElementById('screenSelect').classList.remove('active');
       document.getElementById('screenGates').classList.add('active');
 
-      if (primeCookie) {
+      if (overrideStatus) {
+        setStatus(overrideStatus);
+      } else if (primeCookie) {
         setStatus('ACTIVATED');
       } else {
         setStatus('NEEDS_ACTIVATION');
