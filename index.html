@@ -31,10 +31,8 @@
     .header h1 { color: #333; font-size: 20px; margin-bottom: 5px; }
     .header .subtitle { color: #888; font-size: 13px; }
     
-    .activation-screen { display: block; }
-    .activation-screen.hidden { display: none; }
-    .control-screen { display: none; }
-    .control-screen.active { display: block; }
+    .screen { display: none; }
+    .screen.active { display: block; }
     
     .input-group { margin-bottom: 20px; }
     .input-group label { display: block; font-size: 14px; color: #555; margin-bottom: 8px; font-weight: 500; }
@@ -66,11 +64,13 @@
       transition: all 0.2s ease;
       box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
       text-decoration: none;
+      margin-bottom: 10px;
     }
     .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
     .btn:active { transform: translateY(0) scale(0.98); }
     .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
     .btn-secondary { background: linear-gradient(135deg, #90a4ae 0%, #78909c 100%); }
+    .btn-success { background: linear-gradient(135deg, #4caf50 0%, #43a047 100%); }
     
     .info-box {
       background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
@@ -182,8 +182,8 @@
 </head>
 <body>
   <div class="container">
-    <!-- Экран активации -->
-    <div class="activation-screen" id="activationScreen">
+    <!-- Экран 1: Активация -->
+    <div class="screen active" id="screenActivation">
       <div class="header">
         <div class="logo">🔑</div>
         <h1>Активация доступа</h1>
@@ -200,6 +200,11 @@
         <span>Активировать ссылку</span>
       </button>
       
+      <button class="btn btn-success" onclick="showControlScreen()">
+        <span>✅</span>
+        <span>Ссылка уже активирована — открыть управление</span>
+      </button>
+      
       <div class="status-message" id="activationStatus"></div>
       
       <div class="info-box">
@@ -207,15 +212,15 @@
         <ol>
           <li>Вставьте полученную ссылку в поле выше</li>
           <li>Нажмите «Активировать ссылку»</li>
-          <li>Откроется страница — нажмите «Активировать на этом устройстве»</li>
+          <li>На открывшейся странице нажмите «Активировать на этом устройстве»</li>
           <li>Нажмите <b>Назад</b> в браузере</li>
-          <li>Откроется экран управления воротами</li>
+          <li>Нажмите кнопку «Ссылка уже активирована» выше</li>
         </ol>
       </div>
     </div>
     
-    <!-- Экран управления -->
-    <div class="control-screen" id="controlScreen">
+    <!-- Экран 2: Управление -->
+    <div class="screen" id="screenControl">
       <div class="header">
         <div class="logo">🏠</div>
         <h1>Управление доступом</h1>
@@ -252,7 +257,6 @@
   <script>
     let currentData = { baseUrl: '', token: '', fullUrl: '', gates: [] };
     
-    // Стандартный набор ворот
     const DEFAULT_GATES = [
       { name: 'Ворота 1', deviceId: '1225', icon: '🚪' },
       { name: 'Ворота 2', deviceId: '2390', icon: '🚪' },
@@ -266,7 +270,9 @@
       if (saved) {
         try {
           currentData = JSON.parse(saved);
-          showControlScreen();
+          if (currentData.baseUrl) {
+            showControlScreen();
+          }
         } catch (e) {
           localStorage.removeItem('primeSkudData');
         }
@@ -302,7 +308,6 @@
         gates: DEFAULT_GATES
       };
       
-      // Сохраняем в localStorage ПЕРЕД переходом
       localStorage.setItem('primeSkudData', JSON.stringify(currentData));
       
       btn.disabled = true;
@@ -314,8 +319,23 @@
     }
     
     function showControlScreen() {
-      document.getElementById('activationScreen').classList.add('hidden');
-      document.getElementById('controlScreen').classList.add('active');
+      const saved = localStorage.getItem('primeSkudData');
+      if (!saved) {
+        alert('Сначала введите и активируйте ссылку!');
+        return;
+      }
+      
+      try {
+        currentData = JSON.parse(saved);
+      } catch (e) {
+        alert('Ошибка данных. Введите ссылку заново.');
+        localStorage.removeItem('primeSkudData');
+        return;
+      }
+      
+      document.getElementById('screenActivation').classList.remove('active');
+      document.getElementById('screenControl').classList.add('active');
+      
       document.getElementById('objectName').textContent = 'ТСЖ Паруса над Камой';
       document.getElementById('accessLinkDisplay').textContent = '#' + currentData.token;
       renderGates();
@@ -379,9 +399,11 @@
     function addNewLink() {
       localStorage.removeItem('primeSkudData');
       currentData = { baseUrl: '', token: '', fullUrl: '', gates: [] };
-      document.getElementById('activationScreen').classList.remove('hidden');
-      document.getElementById('controlScreen').classList.remove('active');
+      document.getElementById('screenControl').classList.remove('active');
+      document.getElementById('screenActivation').classList.add('active');
       document.getElementById('accessLink').value = '';
+      document.getElementById('activateBtn').disabled = false;
+      document.getElementById('activateBtn').innerHTML = '<span>🔓</span><span>Активировать ссылку</span>';
     }
     
     function logout() {
