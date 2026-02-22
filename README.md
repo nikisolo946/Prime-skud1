@@ -60,7 +60,7 @@
 ## 📁 Структура проекта
 
 ```
-c:\Users\AntonSolo\Documents\AntiProject\Prime skud\
+
 ├── index.html          # Красивый фронтенд с логикой background fetch
 ├── worker.js           # Код прокси для развертывания в Cloudflare Workers
 └── README.md           # Этот файл
