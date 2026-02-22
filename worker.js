@@ -53,7 +53,6 @@ export default {
       }
 
       const primeResponse = await fetch(targetUrl, fetchOptions);
-      const responseBody = await primeResponse.text();
 
       // 5. Build our response to the Frontend
       const responseHeaders = new Headers(corsHeaders); // добавляем CORS
@@ -65,7 +64,15 @@ export default {
         responseHeaders.set("X-Set-Prime-Cookie", cookieVal);
       }
 
-      return new Response(responseBody, {
+      // Проксируем оригинальный Content-Type (чтобы браузер видел windows-1251)
+      const contentType = primeResponse.headers.get("Content-Type");
+      if (contentType) {
+        responseHeaders.set("Content-Type", contentType);
+      }
+
+      // ВОЗВРАЩАЕМ СЫРОЙ ПОТОК (body), А НЕ text()!
+      // Иначе Cloudflare Worker попытается прочитать windows-1251 как обычный UTF-8 и сломает русские буквы.
+      return new Response(primeResponse.body, {
         status: primeResponse.status,
         headers: responseHeaders,
       });
