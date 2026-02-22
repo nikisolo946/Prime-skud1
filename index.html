@@ -395,7 +395,51 @@
         console.log("Cookie обновлена:", primeCookie);
       }
 
-      return res.text();
+      const responseHtml = await res.text();
+
+      // Анализируем текстовый ответ сервера на критические ошибки
+      const lowerHtml = responseHtml.toLowerCase();
+      if (lowerHtml.includes('удалена') || lowerHtml.includes('не найдена')) {
+        throw new Error('LINK_DELETED');
+      }
+      if (lowerHtml.includes('другом устройстве')) {
+        throw new Error('LINK_STOLEN');
+      }
+
+      return responseHtml;
+    }
+
+    // Вспомогательная функция для смены бейджа статуса
+    function setStatus(type) {
+      const dot = document.getElementById('statusDot');
+      const text = document.getElementById('statusText');
+
+      switch (type) {
+        case 'ACTIVATED':
+          text.innerText = 'Активировано';
+          dot.style.background = '#4caf50'; // Зеленый
+          break;
+        case 'NEEDS_ACTIVATION':
+          text.innerText = 'Требуется активация';
+          dot.style.background = '#ff9800'; // Оранжевый
+          break;
+        case 'ERROR_DELETED':
+          text.innerText = 'Ошибка: Ссылка удалена';
+          dot.style.background = '#f44336'; // Красный
+          break;
+        case 'ERROR_STOLEN':
+          text.innerText = 'Ошибка: Другое устройство';
+          dot.style.background = '#f44336'; // Красный
+          break;
+        case 'ERROR_NETWORK':
+          text.innerText = 'Ошибка сети';
+          dot.style.background = '#f44336'; // Красный
+          break;
+        default:
+          text.innerText = 'Ожидание...';
+          dot.style.background = '#9e9e9e'; // Серый
+          break;
+      }
     }
 
     async function saveAndOpen() {
@@ -419,8 +463,7 @@
         localStorage.setItem('primeSkudUrl', url);
         currentUrl = url;
 
-        // Шаг 1: Загружаем стартовую страницу. Если она требует активации (отдает кнопку "Активировать") - мы её нажмем автоматически,
-        // либо просто получим Set-Cookie.
+        // Шаг 1: Загружаем стартовую страницу
         let responseHtml = await fetchProxy(url);
 
         // Если на странице есть скрипт активации (act_me=1)
@@ -428,7 +471,7 @@
           console.log("Требуется активация по кнопке...");
           const params = new URLSearchParams();
           params.append('act_me', '1');
-          await fetchProxy(url, params); // вызовет POST запрос активации, который вернет нужную Cookie
+          await fetchProxy(url, params); // вызовет POST запрос активации
         }
 
         if (primeCookie) {
@@ -438,7 +481,13 @@
         }
 
       } catch (e) {
-        alert('Ошибка связи: ' + e.message);
+        if (e.message === 'LINK_DELETED') {
+          alert('Ошибка: Эта ссылка была удалена администратором.');
+        } else if (e.message === 'LINK_STOLEN') {
+          alert('Ошибка: Ссылка уже была активирована на другом устройстве.');
+        } else {
+          alert('Ошибка связи: ' + e.message);
+        }
       } finally {
         btn.innerHTML = originHtml;
         btn.disabled = false;
@@ -463,6 +512,8 @@
         // Успех
         btn.style.background = 'linear-gradient(135deg, #43a047 0%, #2e7d32 100%)';
         btn.innerHTML = '<span class="icon">✅</span><span>Открыто!</span>';
+        setStatus('ACTIVATED'); // Подтверждаем, что всё ок
+
         setTimeout(() => {
           btn.style.background = '';
           btn.innerHTML = originHtml;
@@ -470,15 +521,28 @@
         }, 2000);
 
       } catch (err) {
-        // Ошибка
+        // Ошибка - кнопка краснеет
         btn.style.background = 'linear-gradient(135deg, #e53935 0%, #c62828 100%)';
         btn.innerHTML = '<span class="icon">❌</span><span>Ошибка</span>';
+
+        // Меняем глобальный статус
+        if (err.message === 'LINK_DELETED') {
+          setStatus('ERROR_DELETED');
+          localStorage.removeItem('primeCookie');
+          primeCookie = '';
+        } else if (err.message === 'LINK_STOLEN') {
+          setStatus('ERROR_STOLEN');
+          localStorage.removeItem('primeCookie');
+          primeCookie = '';
+        } else {
+          setStatus('ERROR_NETWORK');
+        }
+
         setTimeout(() => {
           btn.style.background = '';
           btn.innerHTML = originHtml;
           btn.disabled = false;
         }, 2000);
-        alert('Не удалось открыть ворота: ' + err.message);
       }
     }
 
@@ -496,11 +560,9 @@
       document.getElementById('screenGates').classList.add('active');
 
       if (primeCookie) {
-        document.getElementById('statusText').innerText = 'Онлайн (Активировано)';
-        document.getElementById('statusDot').style.background = '#4caf50';
+        setStatus('ACTIVATED');
       } else {
-        document.getElementById('statusText').innerText = 'Требуется активация';
-        document.getElementById('statusDot').style.background = '#ff9800';
+        setStatus('NEEDS_ACTIVATION');
       }
     }
 
