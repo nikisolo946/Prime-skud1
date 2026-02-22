@@ -3,417 +3,307 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>ПРАЙМ СКУД — Управление доступом</title>
+  <title>ПРАЙМ СКУД — ТСЖ Паруса над Камой</title>
   <meta name="theme-color" content="#667eea">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Ворота">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 100vh;
+      min-height: 100dvh;
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 20px;
+      padding: 15px;
     }
     .container {
       background: white;
       border-radius: 24px;
-      padding: 30px;
-      max-width: 420px;
+      padding: 25px;
+      max-width: 400px;
       width: 100%;
       box-shadow: 0 20px 60px rgba(0,0,0,0.3);
     }
-    .header { text-align: center; margin-bottom: 25px; }
-    .header .logo { font-size: 48px; margin-bottom: 10px; }
-    .header h1 { color: #333; font-size: 20px; margin-bottom: 5px; }
-    .header .subtitle { color: #888; font-size: 13px; }
+    .header { text-align: center; margin-bottom: 20px; }
+    .header .logo { font-size: 42px; margin-bottom: 8px; }
+    .header h1 { color: #333; font-size: 18px; margin-bottom: 4px; }
+    .header .subtitle { color: #888; font-size: 12px; }
     
-    .screen { display: none; }
-    .screen.active { display: block; }
-    
-    .input-group { margin-bottom: 20px; }
-    .input-group label { display: block; font-size: 14px; color: #555; margin-bottom: 8px; font-weight: 500; }
-    .input-group input {
-      width: 100%;
-      padding: 14px 16px;
-      font-size: 15px;
-      border: 2px solid #e0e0e0;
-      border-radius: 12px;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .input-group input:focus { border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2); }
-    
-    .btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      width: 100%;
-      padding: 16px;
-      font-size: 16px;
-      font-weight: 600;
-      color: white;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border: none;
-      border-radius: 14px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-      text-decoration: none;
-      margin-bottom: 10px;
-    }
-    .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
-    .btn:active { transform: translateY(0) scale(0.98); }
-    .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-    .btn-secondary { background: linear-gradient(135deg, #90a4ae 0%, #78909c 100%); }
-    .btn-success { background: linear-gradient(135deg, #4caf50 0%, #43a047 100%); }
-    
-    .info-box {
-      background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-      color: #1565c0;
-      padding: 16px;
-      border-radius: 12px;
-      margin-top: 20px;
-      font-size: 13px;
-      line-height: 1.6;
-      border: 1px solid #90caf9;
-    }
-    .info-box strong { display: block; margin-bottom: 8px; color: #0d47a1; }
-    .info-box ol { margin: 0; padding-left: 20px; }
-    .info-box li { margin: 4px 0; }
-    
-    .status-message {
-      text-align: center;
-      padding: 12px;
-      border-radius: 10px;
-      margin-top: 15px;
-      font-size: 14px;
-      display: none;
-    }
-    .status-message.success { background: #e8f5e9; color: #2e7d32; display: block; border: 1px solid #a5d6a7; }
-    .status-message.error { background: #ffebee; color: #c62828; display: block; border: 1px solid #ef9a9a; }
-    .status-message.info { background: #fff3e0; color: #e65100; display: block; border: 1px solid #ffcc80; }
-    
-    .object-info {
-      background: #f5f5f5;
+    .object-card {
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+      border-radius: 16px;
       padding: 15px;
-      border-radius: 12px;
       margin-bottom: 20px;
       text-align: center;
     }
-    .object-info .object-name { font-size: 16px; font-weight: 600; color: #333; margin-bottom: 5px; }
-    .object-info .access-link { font-size: 12px; color: #888; word-break: break-all; }
-    
-    .status-bar {
+    .object-card .name { font-size: 15px; font-weight: 600; color: #333; margin-bottom: 5px; }
+    .object-card .link { font-size: 11px; color: #888; word-break: break-all; }
+    .object-card .status {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       background: #e8f5e9;
       color: #2e7d32;
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 12px;
-      margin-top: 10px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      margin-top: 8px;
     }
-    .status-bar .dot {
-      width: 8px;
-      height: 8px;
+    .object-card .status .dot {
+      width: 6px;
+      height: 6px;
       background: #4caf50;
       border-radius: 50%;
       animation: pulse 2s infinite;
     }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     
-    .gates { display: flex; flex-direction: column; gap: 10px; }
-    .gate-btn {
+    .gates { display: flex; flex-direction: column; gap: 8px; }
+    .gate-link {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
+      gap: 10px;
       width: 100%;
-      padding: 18px;
-      font-size: 16px;
+      padding: 16px;
+      font-size: 15px;
+      font-weight: 600;
+      color: white;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 12px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      border: none;
+      cursor: pointer;
+    }
+    .gate-link:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); }
+    .gate-link:active { transform: translateY(0) scale(0.97); }
+    .gate-link .icon { font-size: 18px; }
+    
+    .info-box {
+      background: linear-gradient(135deg, #fff3cd 0%, #ffe8a1 100%);
+      color: #856404;
+      padding: 14px;
+      border-radius: 12px;
+      margin-top: 15px;
+      font-size: 12px;
+      line-height: 1.5;
+      border: 1px solid #ffc107;
+    }
+    .info-box strong { display: block; margin-bottom: 6px; color: #664d03; }
+    
+    .input-group { margin-bottom: 15px; }
+    .input-group label { display: block; font-size: 13px; color: #555; margin-bottom: 6px; font-weight: 500; }
+    .input-group input {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 14px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .input-group input:focus { border-color: #667eea; }
+    
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 14px;
+      font-size: 15px;
       font-weight: 600;
       color: white;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       border: none;
-      border-radius: 14px;
+      border-radius: 12px;
       cursor: pointer;
       transition: all 0.2s ease;
-      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+      text-decoration: none;
+      margin-bottom: 8px;
     }
-    .gate-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
-    .gate-btn:active { transform: translateY(0) scale(0.98); }
-    .gate-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-    .gate-btn .icon { font-size: 22px; }
-    .gate-btn.loading { background: linear-gradient(135deg, #bdbdbd 0%, #9e9e9e 100%); }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-secondary { background: linear-gradient(135deg, #90a4ae 0%, #78909c 100%); }
     
-    .result-message {
-      text-align: center;
-      padding: 12px;
-      border-radius: 10px;
-      margin-top: 15px;
-      font-size: 14px;
-      display: none;
-    }
-    .result-message.success { background: #e8f5e9; color: #2e7d32; display: block; }
-    .result-message.error { background: #ffebee; color: #c62828; display: block; }
+    .screen { display: none; }
+    .screen.active { display: block; }
     
     .footer {
       text-align: center;
-      margin-top: 25px;
-      padding-top: 15px;
+      margin-top: 20px;
+      padding-top: 12px;
       border-top: 1px solid #eee;
-      font-size: 11px;
+      font-size: 10px;
       color: #aaa;
     }
     .footer a { color: #667eea; text-decoration: none; }
     
     @media (max-width: 480px) {
-      body { padding: 15px; }
+      body { padding: 10px; }
       .container { padding: 20px; border-radius: 20px; }
-      .header h1 { font-size: 18px; }
+      .header h1 { font-size: 17px; }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <!-- Экран 1: Активация -->
-    <div class="screen active" id="screenActivation">
+    <!-- Экран 1: Выбор ссылки -->
+    <div class="screen active" id="screenSelect">
       <div class="header">
-        <div class="logo">🔑</div>
-        <h1>Активация доступа</h1>
-        <p class="subtitle">ПРАЙМ СКУД</p>
+        <div class="logo">🏠</div>
+        <h1>ПРАЙМ СКУД</h1>
+        <p class="subtitle">Управление доступом</p>
       </div>
       
       <div class="input-group">
-        <label for="accessLink">Вставьте ссылку доступа:</label>
+        <label>Ваша ссылка доступа:</label>
         <input type="url" id="accessLink" placeholder="https://prime-skud.ru/a/..." autocomplete="off">
       </div>
       
-      <button class="btn" id="activateBtn" onclick="activateLink()">
-        <span>🔓</span>
-        <span>Активировать ссылку</span>
+      <button class="btn" onclick="saveAndOpen()">
+        <span>🚀</span>
+        <span>Открыть страницу ворот</span>
       </button>
       
-      <button class="btn btn-success" onclick="showControlScreen()">
-        <span>✅</span>
-        <span>Ссылка уже активирована — открыть управление</span>
+      <button class="btn btn-secondary" onclick="showGatesScreen()">
+        <span>📱</span>
+        <span>Использовать последнюю ссылку</span>
       </button>
-      
-      <div class="status-message" id="activationStatus"></div>
       
       <div class="info-box">
-        <strong>📋 Как активировать:</strong>
-        <ol>
-          <li>Вставьте полученную ссылку в поле выше</li>
-          <li>Нажмите «Активировать ссылку»</li>
-          <li>На открывшейся странице нажмите «Активировать на этом устройстве»</li>
-          <li>Нажмите <b>Назад</b> в браузере</li>
-          <li>Нажмите кнопку «Ссылка уже активирована» выше</li>
-        </ol>
+        <strong>ℹ️ Как использовать:</strong>
+        Вставьте ссылку или используйте сохранённую.<br>
+        Откроется страница ПРАЙМ СКУД для открытия ворот.
+      </div>
+      
+      <div class="footer">
+        <p>Сервис предоставлен <a href="https://prime-pult.ru/" target="_blank">ПРАЙМ ПУЛЬТ</a></p>
+        <p style="margin-top: 4px;">🇷🇺 Сделано в России</p>
       </div>
     </div>
     
-    <!-- Экран 2: Управление -->
-    <div class="screen" id="screenControl">
+    <!-- Экран 2: Кнопки-ссылки -->
+    <div class="screen" id="screenGates">
       <div class="header">
         <div class="logo">🏠</div>
-        <h1>Управление доступом</h1>
+        <h1>ТСЖ Паруса над Камой</h1>
         <p class="subtitle">ПРАЙМ СКУД</p>
       </div>
       
-      <div class="object-info">
-        <div class="object-name" id="objectName">Загрузка...</div>
-        <div class="access-link" id="accessLinkDisplay"></div>
-        <div class="status-bar">
+      <div class="object-card">
+        <div class="name">ТСЖ Паруса над Камой</div>
+        <div class="link" id="displayLink"></div>
+        <div class="status">
           <span class="dot"></span>
-          <span>Система онлайн</span>
+          <span>Онлайн</span>
         </div>
       </div>
       
-      <div class="gates" id="gatesContainer">
-        <!-- Кнопки генерируются через JS -->
+      <div class="gates">
+        <a href="" class="gate-link" id="gate1" target="_blank">
+          <span class="icon">🚪</span>
+          <span>Ворота 1</span>
+        </a>
+        <a href="" class="gate-link" id="gate2" target="_blank">
+          <span class="icon">🚪</span>
+          <span>Ворота 2</span>
+        </a>
+        <a href="" class="gate-link" id="gate3" target="_blank">
+          <span class="icon">🚪</span>
+          <span>Ворота 3</span>
+        </a>
+        <a href="" class="gate-link" id="gate4" target="_blank">
+          <span class="icon">🏢</span>
+          <span>Подъезд К37</span>
+        </a>
       </div>
       
-      <div class="result-message" id="resultMessage"></div>
+      <div class="info-box">
+        <strong>📱 Как открыть ворота:</strong>
+        1. Нажмите на кнопку ворот<br>
+        2. На открывшейся странице нажмите кнопку открытия<br>
+        3. Ворота откроются!
+      </div>
       
-      <button class="btn btn-secondary" onclick="addNewLink()" style="margin-top: 15px;">
-        <span>➕</span>
-        <span>Добавить другую ссылку</span>
+      <button class="btn btn-secondary" onclick="showSelectScreen()" style="margin-top: 12px;">
+        <span>⚙️</span>
+        <span>Изменить ссылку</span>
       </button>
-    </div>
-    
-    <div class="footer">
-      <p>Сервис предоставлен <a href="https://prime-pult.ru/" target="_blank">ПРАЙМ ПУЛЬТ</a></p>
-      <p style="margin-top: 6px;">🇷🇺 Сделано в России</p>
+      
+      <div class="footer">
+        <p>Сервис предоставлен <a href="https://prime-pult.ru/" target="_blank">ПРАЙМ ПУЛЬТ</a></p>
+        <p style="margin-top: 4px;">🇷🇺 Сделано в России</p>
+      </div>
     </div>
   </div>
   
   <script>
-    let currentData = { baseUrl: '', token: '', fullUrl: '', gates: [] };
+    let currentUrl = '';
     
-    const DEFAULT_GATES = [
-      { name: 'Ворота 1', deviceId: '1225', icon: '🚪' },
-      { name: 'Ворота 2', deviceId: '2390', icon: '🚪' },
-      { name: 'Ворота 3', deviceId: '2394', icon: '🚪' },
-      { name: 'Подъезд К37', deviceId: '2925', icon: '🏢' }
-    ];
-    
-    // При загрузке проверяем сохранённые данные
+    // При загрузке проверяем сохранённую ссылку
     window.addEventListener('load', () => {
-      const saved = localStorage.getItem('primeSkudData');
+      const saved = localStorage.getItem('primeSkudUrl');
       if (saved) {
-        try {
-          currentData = JSON.parse(saved);
-          if (currentData.baseUrl) {
-            showControlScreen();
-          }
-        } catch (e) {
-          localStorage.removeItem('primeSkudData');
-        }
+        currentUrl = saved;
+        document.getElementById('accessLink').value = saved;
       }
     });
     
-    function activateLink() {
+    function saveAndOpen() {
       const input = document.getElementById('accessLink');
-      const status = document.getElementById('activationStatus');
-      const btn = document.getElementById('activateBtn');
-      
       let url = input.value.trim();
+      
       if (!url) {
-        showStatus(status, 'Введите ссылку', 'error');
+        alert('Введите ссылку!');
         return;
       }
       
       if (!url.startsWith('http')) {
         url = 'https://' + url;
-        input.value = url;
       }
       
       if (!url.includes('prime-skud.ru/a/')) {
-        showStatus(status, 'Неверный формат ссылки', 'error');
+        alert('Неверный формат ссылки!');
         return;
       }
       
-      // Сохраняем данные
-      currentData = {
-        fullUrl: url,
-        baseUrl: url.split('?')[0],
-        token: url.split('/a/')[1]?.split('?')[0] || '',
-        gates: DEFAULT_GATES
-      };
+      localStorage.setItem('primeSkudUrl', url);
+      currentUrl = url;
       
-      localStorage.setItem('primeSkudData', JSON.stringify(currentData));
-      
-      btn.disabled = true;
-      btn.innerHTML = '<span>⏳</span><span>Открываем...</span>';
-      
-      setTimeout(() => {
-        window.location.href = url;
-      }, 300);
+      // Открываем в том же окне для сохранения куки
+      window.location.href = url;
     }
     
-    function showControlScreen() {
-      const saved = localStorage.getItem('primeSkudData');
-      if (!saved) {
-        alert('Сначала введите и активируйте ссылку!');
+    function showGatesScreen() {
+      if (!currentUrl) {
+        alert('Сначала введите ссылку!');
         return;
       }
       
-      try {
-        currentData = JSON.parse(saved);
-      } catch (e) {
-        alert('Ошибка данных. Введите ссылку заново.');
-        localStorage.removeItem('primeSkudData');
-        return;
-      }
+      // Устанавливаем ссылки на кнопки
+      document.getElementById('gate1').href = currentUrl;
+      document.getElementById('gate2').href = currentUrl;
+      document.getElementById('gate3').href = currentUrl;
+      document.getElementById('gate4').href = currentUrl;
       
-      document.getElementById('screenActivation').classList.remove('active');
-      document.getElementById('screenControl').classList.add('active');
+      // Показываем ссылку
+      const shortLink = currentUrl.split('/a/')[1]?.split('?')[0] || currentUrl;
+      document.getElementById('displayLink').textContent = '#' + shortLink;
       
-      document.getElementById('objectName').textContent = 'ТСЖ Паруса над Камой';
-      document.getElementById('accessLinkDisplay').textContent = '#' + currentData.token;
-      renderGates();
+      document.getElementById('screenSelect').classList.remove('active');
+      document.getElementById('screenGates').classList.add('active');
     }
     
-    function renderGates() {
-      const container = document.getElementById('gatesContainer');
-      container.innerHTML = '';
-      
-      (currentData.gates || DEFAULT_GATES).forEach(gate => {
-        const btn = document.createElement('button');
-        btn.className = 'gate-btn';
-        btn.innerHTML = '<span class="icon">' + gate.icon + '</span><span>' + gate.name + '</span>';
-        btn.onclick = () => openGate(btn, gate.deviceId, gate.name);
-        container.appendChild(btn);
-      });
-    }
-    
-    async function openGate(btn, deviceId, gateName) {
-      if (btn.disabled) return;
-      
-      const originalHtml = btn.innerHTML;
-      btn.disabled = true;
-      btn.classList.add('loading');
-      btn.innerHTML = '<span class="icon">⏳</span><span>Открываем...</span>';
-      
-      const resultDiv = document.getElementById('resultMessage');
-      resultDiv.className = 'result-message';
-      
-      try {
-        const response = await fetch(currentData.baseUrl, {
-          method: 'POST',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: 'd=' + deviceId + '&r=1'
-        });
-        
-        if (response.ok) {
-          resultDiv.textContent = '✅ ' + gateName + ' открыты!';
-          resultDiv.className = 'result-message success';
-        } else if (response.status === 403 || response.status === 401) {
-          resultDiv.textContent = '❌ Сессия истекла. Активируйте заново.';
-          resultDiv.className = 'result-message error';
-          setTimeout(() => { if (confirm('Сессия истекла. Активировать заново?')) logout(); }, 1000);
-        } else {
-          throw new Error('Ошибка: ' + response.status);
-        }
-      } catch (error) {
-        resultDiv.textContent = '❌ Ошибка: ' + error.message;
-        resultDiv.className = 'result-message error';
-      }
-      
-      setTimeout(() => {
-        btn.disabled = false;
-        btn.classList.remove('loading');
-        btn.innerHTML = originalHtml;
-        resultDiv.className = 'result-message';
-      }, 3000);
-    }
-    
-    function addNewLink() {
-      localStorage.removeItem('primeSkudData');
-      currentData = { baseUrl: '', token: '', fullUrl: '', gates: [] };
-      document.getElementById('screenControl').classList.remove('active');
-      document.getElementById('screenActivation').classList.add('active');
-      document.getElementById('accessLink').value = '';
-      document.getElementById('activateBtn').disabled = false;
-      document.getElementById('activateBtn').innerHTML = '<span>🔓</span><span>Активировать ссылку</span>';
-    }
-    
-    function logout() {
-      addNewLink();
-    }
-    
-    function showStatus(element, message, type) {
-      element.textContent = message;
-      element.className = 'status-message ' + type;
-      setTimeout(() => { element.className = 'status-message'; }, 5000);
+    function showSelectScreen() {
+      document.getElementById('screenGates').classList.remove('active');
+      document.getElementById('screenSelect').classList.add('active');
     }
   </script>
 </body>
