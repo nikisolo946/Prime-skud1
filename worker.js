@@ -1,46 +1,51 @@
 export default {
   async fetch(request, env, ctx) {
+    // Единый набор CORS заголовков для любого ответа
+    const corsHeaders = {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, HEAD, POST, OPTIONS",
+      "Access-Control-Max-Age": "86400",
+      "Access-Control-Expose-Headers": "X-Set-Prime-Cookie",
+    };
+
     // 1. Handling CORS Preflight (OPTIONS)
     if (request.method === "OPTIONS") {
+      const allowedHeaders = request.headers.get("Access-Control-Request-Headers") || "Content-Type, X-Target-Url, X-Prime-Cookie";
       return new Response(null, {
         status: 204,
         headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-          "Access-Control-Allow-Headers": "Content-Type, X-Target-Url, X-Prime-Cookie",
-          "Access-Control-Expose-Headers": "X-Set-Prime-Cookie",
-          "Access-Control-Max-Age": "86400",
+          ...corsHeaders,
+          "Access-Control-Allow-Headers": allowedHeaders,
         },
       });
     }
 
-    // 2. Read custom headers from the real request
-    const targetUrl = request.headers.get("X-Target-Url");
-    const primeCookie = request.headers.get("X-Prime-Cookie");
-
-    if (!targetUrl) {
-      return new Response("Missing X-Target-Url header", { status: 400 });
-    }
-
-    // 3. Prepare headers for prime-skud.ru
-    const newHeaders = new Headers();
-    newHeaders.set("Content-Type", "application/x-www-form-urlencoded");
-    newHeaders.set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
-    newHeaders.set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
-    newHeaders.set("Accept-Language", "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7");
-
-    // Inject our saved cookie as a real cookie!
-    if (primeCookie) {
-      newHeaders.set("Cookie", primeCookie);
-    }
-
     try {
+      // 2. Read custom headers from the real request
+      const targetUrl = request.headers.get("X-Target-Url");
+      const primeCookie = request.headers.get("X-Prime-Cookie");
+
+      if (!targetUrl) {
+        return new Response("Missing X-Target-Url header", { status: 400, headers: corsHeaders });
+      }
+
+      // 3. Prepare headers for prime-skud.ru
+      const newHeaders = new Headers();
+      newHeaders.set("Content-Type", "application/x-www-form-urlencoded");
+      newHeaders.set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
+      newHeaders.set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+      newHeaders.set("Accept-Language", "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7");
+
+      // Inject our saved cookie as a real cookie!
+      if (primeCookie) {
+        newHeaders.set("Cookie", primeCookie);
+      }
+
       // 4. Send the payload to prime-skud.ru
-      // If it's a GET request (like fetching the initial page), body will be null
       const fetchOptions = {
         method: request.method,
         headers: newHeaders,
-        redirect: 'manual' // Don't follow redirects automatically, so we can capture cookies
+        redirect: 'manual'
       };
 
       if (request.method === "POST" && request.body) {
@@ -51,16 +56,11 @@ export default {
       const responseBody = await primeResponse.text();
 
       // 5. Build our response to the Frontend
-      const responseHeaders = new Headers({
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Expose-Headers": "X-Set-Prime-Cookie",
-      });
+      const responseHeaders = new Headers(corsHeaders); // добавляем CORS
 
       // 6. Intercept Set-Cookie from Server and pass it to Frontend safely
       const setCookieHeader = primeResponse.headers.get("Set-Cookie");
       if (setCookieHeader) {
-        // Example Set-Cookie: bind_1055042=fcab1c...; expires=...; path=/; domain=prime-skud.ru
-        // We only need the key=value part
         const cookieVal = setCookieHeader.split(';')[0];
         responseHeaders.set("X-Set-Prime-Cookie", cookieVal);
       }
@@ -71,10 +71,9 @@ export default {
       });
 
     } catch (error) {
-      // Allow Origin even on error to view it in browser console
       return new Response('Proxy Error: ' + error.message, {
         status: 500,
-        headers: { "Access-Control-Allow-Origin": "*" }
+        headers: corsHeaders
       });
     }
   }
