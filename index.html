@@ -3,14 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Открытие ворот — ТСЖ Паруса над Камой</title>
+  <title>ПРАЙМ СКУД — Управление доступом</title>
   
   <!-- PWA / Mobile -->
   <meta name="theme-color" content="#667eea">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Ворота">
-  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚪</text></svg>">
+  <meta name="apple-mobile-web-app-title" content="СКУД">
   
   <style>
     * {
@@ -35,7 +34,7 @@
       background: white;
       border-radius: 24px;
       padding: 30px;
-      max-width: 400px;
+      max-width: 420px;
       width: 100%;
       box-shadow: 0 20px 60px rgba(0,0,0,0.3);
     }
@@ -43,6 +42,11 @@
     .header {
       text-align: center;
       margin-bottom: 25px;
+    }
+    
+    .header .logo {
+      font-size: 48px;
+      margin-bottom: 10px;
     }
     
     .header h1 {
@@ -56,7 +60,177 @@
       font-size: 13px;
     }
     
-    .status {
+    /* Экран активации */
+    .activation-screen {
+      display: block;
+    }
+    
+    .activation-screen.hidden {
+      display: none;
+    }
+    
+    .input-group {
+      margin-bottom: 20px;
+    }
+    
+    .input-group label {
+      display: block;
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    
+    .input-group input {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    
+    .input-group input:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+    }
+    
+    .input-group input::placeholder {
+      color: #bbb;
+    }
+    
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 16px;
+      font-size: 16px;
+      font-weight: 600;
+      color: white;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+      text-decoration: none;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn:active {
+      transform: translateY(0) scale(0.98);
+    }
+    
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .btn-secondary {
+      background: linear-gradient(135deg, #90a4ae 0%, #78909c 100%);
+      box-shadow: 0 4px 15px rgba(120, 144, 156, 0.3);
+    }
+    
+    .btn-success {
+      background: linear-gradient(135deg, #4caf50 0%, #43a047 100%);
+      box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+    }
+    
+    .info-box {
+      background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+      color: #1565c0;
+      padding: 16px;
+      border-radius: 12px;
+      margin-top: 20px;
+      font-size: 13px;
+      line-height: 1.6;
+      border: 1px solid #90caf9;
+    }
+    
+    .info-box strong {
+      display: block;
+      margin-bottom: 8px;
+      color: #0d47a1;
+    }
+    
+    .info-box ol {
+      margin: 0;
+      padding-left: 20px;
+    }
+    
+    .info-box li {
+      margin: 4px 0;
+    }
+    
+    .status-message {
+      text-align: center;
+      padding: 12px;
+      border-radius: 10px;
+      margin-top: 15px;
+      font-size: 14px;
+      display: none;
+    }
+    
+    .status-message.success {
+      background: #e8f5e9;
+      color: #2e7d32;
+      display: block;
+      border: 1px solid #a5d6a7;
+    }
+    
+    .status-message.error {
+      background: #ffebee;
+      color: #c62828;
+      display: block;
+      border: 1px solid #ef9a9a;
+    }
+    
+    .status-message.info {
+      background: #fff3e0;
+      color: #e65100;
+      display: block;
+      border: 1px solid #ffcc80;
+    }
+    
+    /* Экран управления */
+    .control-screen {
+      display: none;
+    }
+    
+    .control-screen.active {
+      display: block;
+    }
+    
+    .object-info {
+      background: #f5f5f5;
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    
+    .object-info .object-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 5px;
+    }
+    
+    .object-info .access-link {
+      font-size: 12px;
+      color: #888;
+      word-break: break-all;
+    }
+    
+    .status-bar {
       display: inline-flex;
       align-items: center;
       gap: 6px;
@@ -65,10 +239,10 @@
       padding: 6px 14px;
       border-radius: 20px;
       font-size: 12px;
-      margin-top: 12px;
+      margin-top: 10px;
     }
     
-    .status-dot {
+    .status-bar .dot {
       width: 8px;
       height: 8px;
       background: #4caf50;
@@ -87,60 +261,66 @@
       gap: 10px;
     }
     
-    .gate-link {
+    .gate-btn {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 12px;
       width: 100%;
-      padding: 20px;
+      padding: 18px;
       font-size: 16px;
       font-weight: 600;
       color: white;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
       border-radius: 14px;
-      text-decoration: none;
+      cursor: pointer;
       transition: all 0.2s ease;
       box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
     }
     
-    .gate-link:hover {
+    .gate-btn:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
     }
     
-    .gate-link:active {
+    .gate-btn:active {
       transform: translateY(0) scale(0.98);
     }
     
-    .gate-link .icon {
+    .gate-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .gate-btn .icon {
       font-size: 22px;
     }
     
-    .info {
-      background: linear-gradient(135deg, #fff3cd 0%, #ffe8a1 100%);
-      color: #856404;
-      padding: 16px;
-      border-radius: 12px;
-      margin-top: 20px;
-      font-size: 13px;
-      line-height: 1.6;
-      border: 1px solid #ffc107;
+    .gate-btn.loading {
+      background: linear-gradient(135deg, #bdbdbd 0%, #9e9e9e 100%);
     }
     
-    .info strong {
+    .result-message {
+      text-align: center;
+      padding: 12px;
+      border-radius: 10px;
+      margin-top: 15px;
+      font-size: 14px;
+      display: none;
+    }
+    
+    .result-message.success {
+      background: #e8f5e9;
+      color: #2e7d32;
       display: block;
-      margin-bottom: 8px;
-      color: #664d03;
     }
     
-    .info ol {
-      margin: 0;
-      padding-left: 20px;
-    }
-    
-    .info li {
-      margin: 4px 0;
+    .result-message.error {
+      background: #ffebee;
+      color: #c62828;
+      display: block;
     }
     
     .footer {
@@ -158,8 +338,9 @@
       font-weight: 500;
     }
     
-    .footer a:hover {
-      text-decoration: underline;
+    /* Скрытый iframe для работы с сессией */
+    #sessionFrame {
+      display: none;
     }
     
     /* Mobile optimizations */
@@ -177,8 +358,8 @@
         font-size: 18px;
       }
       
-      .gate-link {
-        padding: 18px;
+      .gate-btn, .btn {
+        padding: 16px;
         font-size: 15px;
       }
     }
@@ -186,44 +367,69 @@
 </head>
 <body>
   <div class="container">
-    <div class="header">
-      <h1>🏠 ТСЖ Паруса над Камой</h1>
-      <p class="subtitle">Система доступа ПРАЙМ СКУД</p>
-      <div class="status">
-        <span class="status-dot"></span>
-        <span>Система онлайн</span>
+    <!-- Экран активации -->
+    <div class="activation-screen" id="activationScreen">
+      <div class="header">
+        <div class="logo">🔑</div>
+        <h1>Активация доступа</h1>
+        <p class="subtitle">ПРАЙМ СКУД</p>
+      </div>
+      
+      <div class="input-group">
+        <label for="accessLink">Вставьте ссылку доступа:</label>
+        <input 
+          type="url" 
+          id="accessLink" 
+          placeholder="https://prime-skud.ru/a/..."
+          autocomplete="off"
+        >
+      </div>
+      
+      <button class="btn" id="activateBtn" onclick="activateLink()">
+        <span>🔓</span>
+        <span>Активировать ссылку</span>
+      </button>
+      
+      <div class="status-message" id="activationStatus"></div>
+      
+      <div class="info-box">
+        <strong>📋 Как активировать:</strong>
+        <ol>
+          <li>Вставьте полученную ссылку в поле выше</li>
+          <li>Нажмите «Активировать ссылку»</li>
+          <li>Откроется страница активации — нажмите кнопку там</li>
+          <li>Вернитесь на эту страницу — доступ будет активирован</li>
+        </ol>
       </div>
     </div>
     
-    <div class="gates">
-      <a href="https://prime-skud.ru/a/1055042-89ce8100d1c9fce82082a5c481a5f99c" class="gate-link">
-        <span class="icon">🚪</span>
-        <span>Ворота 1</span>
-      </a>
+    <!-- Экран управления -->
+    <div class="control-screen" id="controlScreen">
+      <div class="header">
+        <div class="logo">🏠</div>
+        <h1>Управление доступом</h1>
+        <p class="subtitle">ПРАЙМ СКУД</p>
+      </div>
       
-      <a href="https://prime-skud.ru/a/1055042-89ce8100d1c9fce82082a5c481a5f99c" class="gate-link">
-        <span class="icon">🚪</span>
-        <span>Ворота 2</span>
-      </a>
+      <div class="object-info">
+        <div class="object-name" id="objectName">Загрузка...</div>
+        <div class="access-link" id="accessLinkDisplay"></div>
+        <div class="status-bar">
+          <span class="dot"></span>
+          <span>Система онлайн</span>
+        </div>
+      </div>
       
-      <a href="https://prime-skud.ru/a/1055042-89ce8100d1c9fce82082a5c481a5f99c" class="gate-link">
-        <span class="icon">🚪</span>
-        <span>Ворота 3</span>
-      </a>
+      <div class="gates" id="gatesContainer">
+        <!-- Кнопки генерируются через JS -->
+      </div>
       
-      <a href="https://prime-skud.ru/a/1055042-89ce8100d1c9fce82082a5c481a5f99c" class="gate-link">
-        <span class="icon">🏢</span>
-        <span>Подъезд К37</span>
-      </a>
-    </div>
-    
-    <div class="info">
-      <strong>📱 Как открыть ворота:</strong>
-      <ol>
-        <li>Нажмите на кнопку нужных ворот</li>
-        <li>На открывшейся странице нажмите кнопку ещё раз</li>
-        <li>Ворота откроются!</li>
-      </ol>
+      <div class="result-message" id="resultMessage"></div>
+      
+      <button class="btn btn-secondary" onclick="addNewLink()" style="margin-top: 15px;">
+        <span>➕</span>
+        <span>Добавить другую ссылку</span>
+      </button>
     </div>
     
     <div class="footer">
@@ -232,26 +438,266 @@
     </div>
   </div>
   
+  <!-- Скрытый iframe для сессии -->
+  <iframe id="sessionFrame" name="sessionFrame"></iframe>
+  
   <script>
-    // Добавляем визуальный эффект при нажатии
-    document.querySelectorAll('.gate-link').forEach(link => {
-      link.addEventListener('click', function() {
-        this.style.opacity = '0.7';
-        setTimeout(() => {
-          this.style.opacity = '1';
-        }, 300);
-      });
+    // Хранилище данных
+    let currentData = {
+      baseUrl: '',
+      token: '',
+      fullUrl: '',
+      gates: []
+    };
+    
+    // При загрузке страницы проверяем сохранённые данные
+    window.addEventListener('load', () => {
+      const saved = localStorage.getItem('primeSkudData');
+      if (saved) {
+        try {
+          currentData = JSON.parse(saved);
+          showControlScreen();
+          loadGatesPage();
+        } catch (e) {
+          localStorage.removeItem('primeSkudData');
+        }
+      }
+      
+      // Проверяем, не открыли ли мы страницу активации
+      checkActivationResult();
     });
     
-    // PWA: предложение добавить на главный экран
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
+    // Активация ссылки
+    function activateLink() {
+      const input = document.getElementById('accessLink');
+      const status = document.getElementById('activationStatus');
+      const btn = document.getElementById('activateBtn');
       
-      // Показываем кнопку установки (опционально)
-      console.log('PWA доступно для установки');
-    });
+      let url = input.value.trim();
+      
+      if (!url) {
+        showStatus(status, 'Введите ссылку', 'error');
+        return;
+      }
+      
+      // Добавляем https:// если нет
+      if (!url.startsWith('http')) {
+        url = 'https://' + url;
+        input.value = url;
+      }
+      
+      // Проверяем формат
+      if (!url.includes('prime-skud.ru/a/')) {
+        showStatus(status, 'Неверный формат ссылки. Должна содержать prime-skud.ru/a/', 'error');
+        return;
+      }
+      
+      // Сохраняем данные
+      currentData.fullUrl = url;
+      currentData.baseUrl = url.split('?')[0];
+      const tokenMatch = url.match(/\/a\/([^\s?]+)/);
+      if (tokenMatch) {
+        currentData.token = tokenMatch[1];
+      }
+      
+      // Открываем страницу активации в том же окне
+      btn.disabled = true;
+      btn.innerHTML = '<span>⏳</span><span>Открываем...</span>';
+      
+      showStatus(status, 'Открывается страница активации...', 'info');
+      
+      setTimeout(() => {
+        // Сохраняем состояние и открываем активацию
+        localStorage.setItem('primeSkudPending', JSON.stringify(currentData));
+        window.location.href = url;
+      }, 500);
+    }
+    
+    // Проверка результата активации
+    function checkActivationResult() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const pendingData = localStorage.getItem('primeSkudPending');
+      
+      // Если вернулись после активации
+      if (pendingData && document.referrer.includes('prime-skud.ru')) {
+        try {
+          currentData = JSON.parse(pendingData);
+          localStorage.setItem('primeSkudData', JSON.stringify(currentData));
+          localStorage.removeItem('primeSkudPending');
+          
+          // Показываем экран управления
+          showControlScreen();
+          loadGatesPage();
+          
+          showStatus(document.getElementById('resultMessage'), 'Ссылка активирована! Теперь вы можете открывать ворота.', 'success');
+        } catch (e) {
+          console.error('Ошибка восстановления данных:', e);
+        }
+      }
+    }
+    
+    // Загрузка страницы с кнопками
+    function loadGatesPage() {
+      const iframe = document.getElementById('sessionFrame');
+      iframe.src = currentData.fullUrl;
+      
+      // Парсим страницу для получения списка ворот
+      setTimeout(() => {
+        parseGatesFromFrame();
+      }, 2000);
+    }
+    
+    // Парсинг списка ворот из iframe
+    function parseGatesFromFrame() {
+      const iframe = document.getElementById('sessionFrame');
+      let gates = [];
+      
+      try {
+        // Пытаемся получить доступ к содержимому iframe
+        const doc = iframe.contentDocument || iframe.contentWindow.document;
+        
+        // Ищем кнопки в iframe
+        const buttons = doc.querySelectorAll('input[type="button"], button');
+        buttons.forEach((btn, index) => {
+          const value = btn.value || btn.textContent.trim();
+          if (value && !value.includes('Создать')) {
+            // Извлекаем ID устройства из onclick
+            const onclick = btn.getAttribute('onclick') || '';
+            const deviceMatch = onclick.match(/d=(\d+)/);
+            const deviceId = deviceMatch ? deviceMatch[1] : String(index + 1);
+            
+            gates.push({
+              name: value,
+              deviceId: deviceId,
+              icon: value.includes('Подъезд') || value.toLowerCase().includes('к') ? '🏢' : '🚪'
+            });
+          }
+        });
+      } catch (e) {
+        // CORS не позволяет прочитать iframe — используем стандартный набор
+        console.log('Не удалось прочитать iframe, используем стандартный набор');
+      }
+      
+      // Если не нашли кнопки или ошибка CORS — используем стандартный набор
+      if (gates.length === 0) {
+        gates = [
+          { name: 'Ворота 1', deviceId: '1225', icon: '🚪' },
+          { name: 'Ворота 2', deviceId: '2390', icon: '🚪' },
+          { name: 'Ворота 3', deviceId: '2394', icon: '🚪' },
+          { name: 'Подъезд К37', deviceId: '2925', icon: '🏢' }
+        ];
+      }
+      
+      currentData.gates = gates;
+      localStorage.setItem('primeSkudData', JSON.stringify(currentData));
+      renderGates();
+    }
+    
+    // Отрисовка кнопок ворот
+    function renderGates() {
+      const container = document.getElementById('gatesContainer');
+      container.innerHTML = '';
+      
+      currentData.gates.forEach(gate => {
+        const btn = document.createElement('button');
+        btn.className = 'gate-btn';
+        btn.innerHTML = `<span class="icon">${gate.icon}</span><span>${gate.name}</span>`;
+        btn.onclick = () => openGate(btn, gate.deviceId, gate.name);
+        container.appendChild(btn);
+      });
+      
+      // Обновляем информацию об объекте
+      document.getElementById('objectName').textContent = 'ТСЖ Паруса над Камой';
+      document.getElementById('accessLinkDisplay').textContent = '#' + currentData.token;
+    }
+    
+    // Открытие ворот
+    async function openGate(btn, deviceId, gateName) {
+      if (btn.disabled) return;
+      
+      const originalHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.classList.add('loading');
+      btn.innerHTML = '<span class="icon">⏳</span><span>Открываем...</span>';
+      
+      const resultDiv = document.getElementById('resultMessage');
+      resultDiv.className = 'result-message';
+      
+      try {
+        // Отправляем запрос с куки
+        const response = await fetch(currentData.baseUrl, {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: `d=${deviceId}&r=1`
+        });
+        
+        if (response.ok) {
+          resultDiv.textContent = '✅ ' + gateName + ' открыты!';
+          resultDiv.className = 'result-message success';
+        } else if (response.status === 403 || response.status === 401) {
+          // Сессия истекла — нужно переактивировать
+          resultDiv.textContent = '❌ Сессия истекла. Активируйте ссылку заново.';
+          resultDiv.className = 'result-message error';
+          setTimeout(() => {
+            if (confirm('Сессия истекла. Активировать заново?')) {
+              logout();
+            }
+          }, 1000);
+        } else {
+          throw new Error('Ошибка сервера: ' + response.status);
+        }
+      } catch (error) {
+        resultDiv.textContent = '❌ Ошибка: ' + error.message;
+        resultDiv.className = 'result-message error';
+      }
+      
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.classList.remove('loading');
+        btn.innerHTML = originalHtml;
+        resultDiv.className = 'result-message';
+      }, 3000);
+    }
+    
+    // Показать экран управления
+    function showControlScreen() {
+      document.getElementById('activationScreen').classList.add('hidden');
+      document.getElementById('controlScreen').classList.add('active');
+    }
+    
+    // Показать экран активации
+    function showActivationScreen() {
+      document.getElementById('controlScreen').classList.remove('active');
+      document.getElementById('activationScreen').classList.remove('hidden');
+    }
+    
+    // Добавить новую ссылку
+    function addNewLink() {
+      localStorage.removeItem('primeSkudData');
+      currentData = { baseUrl: '', token: '', fullUrl: '', gates: [] };
+      showActivationScreen();
+      document.getElementById('accessLink').value = '';
+    }
+    
+    // Выход / сброс
+    function logout() {
+      localStorage.removeItem('primeSkudData');
+      currentData = { baseUrl: '', token: '', fullUrl: '', gates: [] };
+      showActivationScreen();
+      document.getElementById('accessLink').value = '';
+    }
+    
+    // Отображение статуса
+    function showStatus(element, message, type) {
+      element.textContent = message;
+      element.className = 'status-message ' + type;
+      setTimeout(() => {
+        element.className = 'status-message';
+      }, 5000);
+    }
   </script>
 </body>
 </html>
