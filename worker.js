@@ -1,35 +1,81 @@
 export default {
-  async fetch(request) {
-    if (request.method !== 'POST') {
-      return new Response('Only POST allowed', { status: 405 });
+  async fetch(request, env, ctx) {
+    // 1. Handling CORS Preflight (OPTIONS)
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        status: 204,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type, X-Target-Url, X-Prime-Cookie",
+          "Access-Control-Expose-Headers": "X-Set-Prime-Cookie",
+          "Access-Control-Max-Age": "86400",
+        },
+      });
     }
 
-    const API_URL = 'https://prime-skud.ru/a/1055042-89ce8100d1c9fce82082a5c481a5f99c';
-    const body = await request.text();
-    
+    // 2. Read custom headers from the real request
+    const targetUrl = request.headers.get("X-Target-Url");
+    const primeCookie = request.headers.get("X-Prime-Cookie");
+
+    if (!targetUrl) {
+      return new Response("Missing X-Target-Url header", { status: 400 });
+    }
+
+    // 3. Prepare headers for prime-skud.ru
+    const newHeaders = new Headers();
+    newHeaders.set("Content-Type", "application/x-www-form-urlencoded");
+    newHeaders.set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
+    newHeaders.set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+    newHeaders.set("Accept-Language", "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7");
+
+    // Inject our saved cookie as a real cookie!
+    if (primeCookie) {
+      newHeaders.set("Cookie", primeCookie);
+    }
+
     try {
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-          'Accept-Language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7',
-        },
-        body: body,
+      // 4. Send the payload to prime-skud.ru
+      // If it's a GET request (like fetching the initial page), body will be null
+      const fetchOptions = {
+        method: request.method,
+        headers: newHeaders,
+        redirect: 'manual' // Don't follow redirects automatically, so we can capture cookies
+      };
+
+      if (request.method === "POST" && request.body) {
+        fetchOptions.body = await request.text();
+      }
+
+      const primeResponse = await fetch(targetUrl, fetchOptions);
+      const responseBody = await primeResponse.text();
+
+      // 5. Build our response to the Frontend
+      const responseHeaders = new Headers({
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Expose-Headers": "X-Set-Prime-Cookie",
       });
-      
-      // Возвращаем ответ как есть
-      return new Response(response.body, {
-        status: response.status,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'POST',
-          'Access-Control-Allow-Headers': 'Content-Type',
-        }
+
+      // 6. Intercept Set-Cookie from Server and pass it to Frontend safely
+      const setCookieHeader = primeResponse.headers.get("Set-Cookie");
+      if (setCookieHeader) {
+        // Example Set-Cookie: bind_1055042=fcab1c...; expires=...; path=/; domain=prime-skud.ru
+        // We only need the key=value part
+        const cookieVal = setCookieHeader.split(';')[0];
+        responseHeaders.set("X-Set-Prime-Cookie", cookieVal);
+      }
+
+      return new Response(responseBody, {
+        status: primeResponse.status,
+        headers: responseHeaders,
       });
+
     } catch (error) {
-      return new Response('Error: ' + error.message, { status: 500 });
+      // Allow Origin even on error to view it in browser console
+      return new Response('Proxy Error: ' + error.message, {
+        status: 500,
+        headers: { "Access-Control-Allow-Origin": "*" }
+      });
     }
   }
 };
