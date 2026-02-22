@@ -395,7 +395,11 @@
         console.log("Cookie обновлена:", primeCookie);
       }
 
-      const responseHtml = await res.text();
+      // Сервер ПРАЙМ СКУД отдает в кодировке windows-1251, поэтому 
+      // декодируем текст вручную, иначе русские буквы станут знаками вопроса 
+      const buffer = await res.arrayBuffer();
+      const decoder = new TextDecoder('windows-1251');
+      const responseHtml = decoder.decode(buffer);
 
       // Анализируем текстовый ответ сервера на критические ошибки
       const lowerHtml = responseHtml.toLowerCase();
